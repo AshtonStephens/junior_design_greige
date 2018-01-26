@@ -1,0 +1,368 @@
+
+/*  
+ *  sketch_phase_01A.ino 
+ *  
+ *  Purpose:  
+ *      Makes a state machine with the states:
+ *          ON, OFF, RUN, DIAGNOSTIC, SLEEP
+ *  
+ *  Date:  1/25/18
+ *  By: Ashish, Aji, Ashton
+ *  Junior Design Spring 2018
+ *  
+ */
+
+int LED_ON    = 255;
+int RED_PIN   = 12;
+int GREEN_PIN = 11;
+int BLUE_PIN  = 10;
+
+int PWR_PIN   = 20;
+int RUN_PIN   = 19;
+int DIAG_PIN  = 18;
+
+#define POT1_PIN A1 // Blue LED brightness
+#define POT2_PIN A0 // Green LED frequency
+
+static const int RUN_SWITCH1_PIN = 2;
+static const int RUN_SWITCH2_PIN = 3;
+
+int numProblem;
+int blueBrightness;
+int greenDutyCycle; // in ms
+
+
+static const float e = 2.718281;
+#define OFF_STATE 0
+#define ON_STATE 1
+#define RUN_STATE 2
+#define DIAGNOSTIC_STATE 3
+#define SLEEP_STATE 4
+
+#define RUN_NOSWITCH 0
+#define RUN_SWITCH1 1
+#define RUN_SWITCH2 2
+static int STATE = OFF_STATE;
+static int RUN_SWITCH_STATE = RUN_NOSWITCH;
+
+void setup() 
+{
+    // ----- SETUP SERIAL COMM ----------- //
+    Serial.begin(9600);
+    while (!Serial)  {}
+    Serial.print("printing ready\n");
+
+    // ----- LED Output Pins ------------- //
+    pinMode(RED_PIN, OUTPUT);
+    pinMode(GREEN_PIN, OUTPUT);
+    pinMode(BLUE_PIN, OUTPUT);
+
+    // ----- SETUP DIAGNOSTIC INTERRUPT -- //
+    pinMode(DIAG_PIN, INPUT_PULLUP); 
+    attachInterrupt(digitalPinToInterrupt(DIAG_PIN), diagnostic_state, RISING);
+
+    // ----- SETUP RUN SWITCH INTERRUPT -- //
+    pinMode(RUN_PIN, INPUT_PULLUP);
+    attachInterrupt(digitalPinToInterrupt(RUN_PIN), ISR_run, RISING);
+
+    // ----- SETUP PWR SWITCH INTERRUPT -- //
+    pinMode(PWR_PIN, INPUT_PULLUP);
+    attachInterrupt(digitalPinToInterrupt(PWR_PIN), ISR_power, RISING);
+
+    // ----- Run State Switch Inputs ----- //
+    pinMode(RUN_SWITCH1_PIN, INPUT_PULLUP);
+    pinMode(RUN_SWITCH2_PIN, INPUT_PULLUP);
+
+    // ----- LED Potentiometer Control --- //
+    pinMode(POT1_PIN, INPUT);
+    pinMode(POT2_PIN, INPUT);  
+    
+    numProblem = 5; // #Diagnostic issues, to be modified later
+    
+    interrupts();
+  
+}
+
+void loop() 
+{
+  // put your main code here, to run repeatedly:
+    off_state  ();
+    on_state   ();
+    run_state  ();
+    sleep_state();
+}
+
+void off_state(){
+    // DETACH/REATTACH: DIAG_PIN
+    attachInterrupt(digitalPinToInterrupt(DIAG_PIN), nothing_state, RISING);
+    while (STATE == OFF_STATE) {
+        analogWrite(RED_PIN,  0);
+        analogWrite(GREEN_PIN,0);
+        analogWrite(BLUE_PIN, 0);
+    }
+    attachInterrupt(digitalPinToInterrupt(DIAG_PIN), diagnostic_state, RISING);
+}
+
+void on_state () 
+{
+ static unsigned long last = 0;
+  while (STATE == ON_STATE) {
+    // LED BLINK Routine: Red 10Hz
+    //  If 1/2 duty cycle has elapsed since last time the LED was set,
+    //  toggle state of LED.
+    if (millis() - last > 100) {
+      last = millis();
+      analogWrite(RED_PIN, 0);
+    } else if (millis() - last > 50) {
+      analogWrite(RED_PIN, LED_ON);
+    }
+  }
+  
+  analogWrite(RED_PIN, 0);
+}
+
+void run_state()
+{ 
+     attachInterrupt(digitalPinToInterrupt(RUN_SWITCH1_PIN), 
+                    ISR_run_switch1, FALLING);
+  
+  unsigned long last = millis();
+  //unsigned long start = millis();
+  
+  while (STATE == RUN_STATE) { 
+    int brightness = 255;
+    bool fadeDone = false;
+    int blinkCount = 0;
+    while(!fadeDone || blinkCount >= 0) {
+      if(!fadeDone) {
+          //Serial.print("Green brightness updated - ");
+          //Serial.println(brightness);
+          brightness = (int)round( 
+                    (double)brightness * pow(e,-(((double)millis() - 
+                    (double)last)/1000)/30)); //time constant
+          analogWrite(GREEN_PIN, brightness);
+          if(brightness < 10) {
+            blinkCount = 
+                (int)round((double)5/(double)1023 * 
+                (double)analogRead(POT2_PIN));
+            fadeDone = true;
+          }
+      }
+      
+      if(fadeDone && blinkCount >= 0) {
+          if (millis() - last > 500) {
+              last = millis();
+              analogWrite(GREEN_PIN, 0);
+              blinkCount--;
+          } else if (millis() - last > 250) {
+              analogWrite(GREEN_PIN, LED_ON);
+          }
+      }
+    
+      blueBrightness = 
+          (int)round((double)255/(double)1023 *
+          (double)analogRead(POT1_PIN));
+      
+      static unsigned long lastBlue = millis();
+      if(RUN_SWITCH_STATE == RUN_NOSWITCH){
+        attachInterrupt(digitalPinToInterrupt(RUN_SWITCH2_PIN), 
+                        nothing_state, RISING);
+        lastBlue = run_noswitch_state(lastBlue);
+      }
+      else if(RUN_SWITCH_STATE == RUN_SWITCH1){
+        attachInterrupt(digitalPinToInterrupt(RUN_SWITCH2_PIN), 
+                        ISR_run_switch2, RISING);
+        lastBlue = run_switch1_state(lastBlue);
+      }
+      else if(RUN_SWITCH_STATE == RUN_SWITCH2){
+        attachInterrupt(digitalPinToInterrupt(RUN_SWITCH2_PIN), 
+                        nothing_state, RISING);
+        lastBlue = run_switch2_state(lastBlue);
+      }
+    }
+  }
+  
+  analogWrite(GREEN_PIN, 0);
+  analogWrite(BLUE_PIN, 0);
+  attachInterrupt(digitalPinToInterrupt(RUN_SWITCH1_PIN), nothing_state, FALLING);
+}
+
+unsigned long run_noswitch_state(unsigned long lastBlue){
+  analogWrite(RED_PIN, 0);
+  if(millis() - lastBlue > 1000) {
+      lastBlue = millis();
+      analogWrite(BLUE_PIN, 0);
+  } else if(millis() - lastBlue > 500) {
+      analogWrite(BLUE_PIN, blueBrightness);
+  }
+
+  return lastBlue;
+}
+
+unsigned long run_switch1_state(unsigned long lastBlue){
+  analogWrite(RED_PIN, 0);
+  if(millis() - lastBlue > 100) {
+      lastBlue = millis();
+      analogWrite(BLUE_PIN, 0);
+  } else if(millis() - lastBlue > 50) {
+      analogWrite(BLUE_PIN, blueBrightness);
+  }
+
+  
+  return lastBlue;
+}
+
+unsigned long run_switch2_state(unsigned long lastBlue){
+  Serial.println("IN switch2 state...");
+  analogWrite(RED_PIN, LED_ON); 
+  if(millis() - lastBlue > 100) {
+      lastBlue = millis();
+      analogWrite(BLUE_PIN, 0);
+  } else if(millis() - lastBlue > 50) {
+      analogWrite(BLUE_PIN, blueBrightness);
+  }
+
+  return lastBlue;
+}
+
+void sleep_state()
+{
+  // DETACH/REATTACH: DIAG_PIN
+  attachInterrupt(digitalPinToInterrupt(DIAG_PIN), nothing_state, RISING);
+  
+  unsigned long last = millis();
+  int count = 3;
+  while (STATE == SLEEP_STATE) {
+    analogWrite(RED_PIN, 0);
+    // RUN CODE
+    while(count > 0){
+        if(millis() - last > 250) {
+            last = millis();
+            count--;
+            analogWrite(BLUE_PIN, 0);
+        } else if(millis() - last > 125) {
+            analogWrite(BLUE_PIN, LED_ON);
+        }
+    }
+    unsigned long transition = millis();
+    last = transition;
+    int brightness = 255;
+    // fade lasts for a second
+    while(millis() - transition < 1000){
+        while(millis() - last < 50){
+        }
+        analogWrite(BLUE_PIN, brightness);
+        last = millis();
+        brightness -= 13;
+    }
+    STATE = OFF_STATE;
+  }
+  analogWrite(BLUE_PIN, 0);
+  attachInterrupt(digitalPinToInterrupt(DIAG_PIN), diagnostic_state, RISING);
+}
+
+//--------------------------------------------
+//----- Interrupt Service Handlers -----------
+//--------------------------------------------
+
+void ISR_run()
+{
+    static unsigned long  runLastPress = 0;
+    static const unsigned long debounce_delay = 500;
+    if (millis() - runLastPress > debounce_delay) {
+          Serial.print("ISR_run being called on state \n ... ");
+          Serial.println(STATE);
+         runLastPress = millis();
+         if(STATE == RUN_STATE){
+            RUN_SWITCH_STATE = RUN_NOSWITCH;
+            STATE = ON_STATE;
+         }
+         else if(STATE == ON_STATE){
+            STATE = RUN_STATE;
+         }
+    }
+}
+
+void ISR_run_switch1()
+{
+  static unsigned long  runLastPress = 0;
+  static const unsigned long debounce_delay = 50;
+  Serial.println("Switch 1 interrupt triggered...");
+   if (millis() - runLastPress > debounce_delay) {
+     runLastPress = millis();
+     Serial.println("Switch 1 state changed...");
+     if(RUN_SWITCH_STATE == RUN_NOSWITCH){
+        RUN_SWITCH_STATE = RUN_SWITCH1;
+     }
+   }
+}
+
+void ISR_run_switch2()
+{
+  static unsigned long  runLastPress = 0;
+  static const unsigned long debounce_delay = 50;
+  Serial.println("Switch 2 interrupt triggered...");
+
+   if (millis() - runLastPress > debounce_delay) {
+    Serial.println("Switch 2 interrupt triggered...");
+
+     runLastPress = millis();
+     if(RUN_SWITCH_STATE == RUN_SWITCH1){
+        RUN_SWITCH_STATE = RUN_SWITCH2;
+     }
+   }
+}
+
+void ISR_power()
+{
+  static unsigned long  runLastPress = 0;
+  static const unsigned long debounce_delay = 500;
+
+    if (millis() - runLastPress > debounce_delay) {
+        Serial.print("ISR_power being called on state ");
+        Serial.println(STATE);
+        runLastPress = millis();
+        if(STATE == RUN_STATE || STATE == ON_STATE){
+            RUN_SWITCH_STATE = RUN_NOSWITCH;
+            STATE = SLEEP_STATE;
+        }
+        else if(STATE == OFF_STATE){
+            STATE = ON_STATE;
+        }
+    }
+    Serial.println("State changed to ");
+    Serial.print(STATE);
+}
+
+void diagnostic_state()
+{
+  // DETACH/REATTACH: DIAG_PIN, RUN_PIN
+  attachInterrupt(digitalPinToInterrupt(DIAG_PIN), nothing_state, RISING);
+  attachInterrupt(digitalPinToInterrupt(RUN_PIN),  nothing_state, RISING);
+  interrupts();
+
+  unsigned long last = 0;
+  int count = numProblem + 1;
+  
+  analogWrite(GREEN_PIN, 0);
+  analogWrite(BLUE_PIN,  0);
+    
+  while (count > 0) {
+      // DIAGNOSTIC CODE
+      Serial.println(count);
+      if (millis() - last > 500) {
+        last = millis();
+        count--; 
+        analogWrite(RED_PIN, 0);
+    } else if (millis() - last > 250) {
+        analogWrite(RED_PIN, LED_ON);
+    }
+  }
+  attachInterrupt(digitalPinToInterrupt(DIAG_PIN), diagnostic_state, RISING);
+  attachInterrupt(digitalPinToInterrupt(RUN_PIN), ISR_run, RISING);
+  analogWrite(RED_PIN, 0);
+}
+
+// IMPORTANT FUNCTION FOR INTERRUPTS
+// --------- DON'T DELETE ---------
+void nothing_state () { }
