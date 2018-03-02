@@ -201,7 +201,7 @@ void loop(){
       if(d1.getMotorMode() == 0){
         state = 0;
         stateReset();
-        subStateCount = ++subStateCount;
+        ++subStateCount;
         Flag = HIGH;
       }
       break;
