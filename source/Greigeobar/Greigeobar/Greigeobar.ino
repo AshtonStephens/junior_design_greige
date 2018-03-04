@@ -1,6 +1,8 @@
 
-
- #include "real_class.h"
+#include "bot.h"
+#include "csensor.h"
+#include "motor.h"
+#include "state.h"
 
 void setup() {
   // put your setup code here, to run once:
