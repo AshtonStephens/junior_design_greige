@@ -148,6 +148,22 @@ ISR(TIMER1_COMPA_vect)
   TIMSK1 |= (1 << OCIE1A); /////////// ENABLE TIMER1 INTERRUPT
 }
 
+
+
+
+//------------------------------------------------------------------------ //
+//                          ------- LOOP -------                        -- //
+//------------------------------------------------------------------------ //
+
+#define CORRECTION_TIME_BACK  100
+#define CORRECTION_TIME_RIGHT 100
+#define CORRECTION_TIME_LEFT  200
+
+#define CORRECTION_SPEED_BACK  30
+#define CORRECTION_SPEED_RIGHT 30
+#define CORRECTION_SPEED_LEFT  30
+
+
 void loop() 
 {
   //  CODE DESCRIPTION:
@@ -178,16 +194,16 @@ void loop()
          *  GO BACK
          */
         timer = start_timer();
-        while (wait_time(timer, 500)) {
-          backward(40);   
+        while (wait_time(timer, CORRECTION_TIME_BACK)) {
+          backward(CORRECTION_SPEED_BACK);   
         } 
 
         /* 
          *  TURN RIGHT
          */
         timer = start_timer();
-        while (wait_time(timer,500)) {
-            turn_right(40);  
+        while (wait_time(timer,100, CORRECTION_TIME_RIGHT)) {
+            turn_right(CORRECTION_SPEED_RIGHT);  
         }
 
         /* 
@@ -195,10 +211,10 @@ void loop()
          * THE COLORS I'M LOOKING FOR OR RUN OUT OF TIME
          */
         timer = start_timer();
-        while (wait_time(timer,500) &&
+        while (wait_time(timer,CORRECTION_TIME_LEFT) &&
             bot.csensor.color != RED &&
             bot.csensor.color != BLUE) {
-            turn_left(40);  
+            turn_left(CORRECTION_SPEED_LEFT);  
         }
               
     } else {
