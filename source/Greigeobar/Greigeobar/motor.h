@@ -4,7 +4,7 @@
 // Purpose: To define the motor system for the autonomous bot
 //
 // Date: 3-3-18 
-// By:  Ashton Stephens and Joseph Ming
+// By:  Ashton Stephens and Joseph Mang
 //
 
 #ifndef MOTOR_H
@@ -18,6 +18,7 @@ class motor
       int pin_2;
   public:
 
+	// TODO: INITIALIZE PINZ
       motor (int pin_enable, int pin1, int pin2) :
       pin_enable(pin_enable), pin1(pin1), pin2(pin2) {}
           

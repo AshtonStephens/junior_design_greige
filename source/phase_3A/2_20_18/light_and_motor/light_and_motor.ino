@@ -1,4 +1,3 @@
-
 static const int MOTOR1_PIN1   = 8;  // 
 static const int MOTOR1_PIN2   = 9;  //
 static const int MOTOR1_ENABLE = 32; //
@@ -10,8 +9,7 @@ static const int MOTOR2_ENABLE = 30; //
 static const int CSENSOR_LED_RED  = 22; //
 static const int CSENSOR_LED_BLUE = 24; //
 
-static const int CSENSOR          = 26; //
-//static const int CSENSOR          =  ; // 
+static const int CSENSOR          = A5; //
 
 // NOTE : 
 //  CANNOT USE PWN PINS 13, 12, 11 because 
@@ -48,7 +46,7 @@ typedef struct csensor_S
   int current_color;
   int readings_left;
   int readings_per_decision;
-  int color_readings[2];
+  float color_readings[2];
   int color;
 } *csensor_T;
 
@@ -80,7 +78,7 @@ unsigned long start_timer ()
 {return millis();}
 
 bool wait_time(unsigned long timer, unsigned long wait_time)
-{return millis() - timer > wait_time;}
+{return millis() - timer < wait_time;}
 
 void setup() 
 {
@@ -156,16 +154,19 @@ ISR(TIMER1_COMPA_vect)
 //------------------------------------------------------------------------ //
 
 #define CORRECTION_TIME_BACK  100
-#define CORRECTION_TIME_RIGHT 100
-#define CORRECTION_TIME_LEFT  200
+#define CORRECTION_TIME_RIGHT 500
+#define CORRECTION_TIME_LEFT  1000
 
-#define CORRECTION_SPEED_BACK  30
-#define CORRECTION_SPEED_RIGHT 30
-#define CORRECTION_SPEED_LEFT  30
+#define CORRECTION_SPEED_BACK  70
+#define CORRECTION_SPEED_RIGHT 70
+#define CORRECTION_SPEED_LEFT  70
 
 
 void loop() 
 {
+
+
+  
   //  CODE DESCRIPTION:
   //    state 0:
   //      stay on color blue until ya reach red and go forward
@@ -178,32 +179,38 @@ void loop()
   //
   int state0_0 = 0;
   int timer = 0;
-
+ // int search_spread_start
+  
+  stahp();
+  
   // while we're not on RED
   while (bot.csensor.color != RED) {
     /* 
      *  GO FORWARD WHILE ON BLUE
      */
     if (bot.csensor.color == BLUE) {
-      forward(40);
+      forward(75);
     // else
     
     } else if (bot.csensor.color != RED) {
-        
+
         /* 
          *  GO BACK
          */
-        timer = start_timer();
-        while (wait_time(timer, CORRECTION_TIME_BACK)) {
-          backward(CORRECTION_SPEED_BACK);   
-        } 
+     //   timer = start_timer();
+       // while (wait_time(timer, CORRECTION_TIME_BACK)) {
+        //  backward(CORRECTION_SPEED_BACK);   
+        //} 
 
         /* 
          *  TURN RIGHT
          */
         timer = start_timer();
-        while (wait_time(timer,100, CORRECTION_TIME_RIGHT)) {
-            turn_right(CORRECTION_SPEED_RIGHT);  
+        while (wait_time(timer,CORRECTION_TIME_RIGHT) &&
+            bot.csensor.color != RED &&
+            bot.csensor.color != BLUE)
+        {
+            turn_left(CORRECTION_SPEED_RIGHT);  
         }
 
         /* 
@@ -214,15 +221,34 @@ void loop()
         while (wait_time(timer,CORRECTION_TIME_LEFT) &&
             bot.csensor.color != RED &&
             bot.csensor.color != BLUE) {
-            turn_left(CORRECTION_SPEED_LEFT);  
+            turn_right(CORRECTION_SPEED_LEFT);  
         }
               
     } else {
       stahp();
     }
   }
-  stahp();
 
+
+
+  timer = start_timer();
+  while (wait_time(timer,CORRECTION_TIME_RIGHT)) {
+    turn_right(CORRECTION_SPEED_RIGHT);  
+  }
+
+
+  
+  while (bot.csensor.color != BLACK) {
+    forward(75); 
+  } 
+
+  while (bot.csensor.color != RED) {
+    turn_right(75); 
+  }  
+   
+  while (bot.csensor.color == YELLOW) {
+    stahp(); 
+  }  
   
 }
 
@@ -249,7 +275,19 @@ void forward(int spd)
   digitalWrite(MOTOR1_ENABLE, HIGH); // R goes fwd
 }
 
-void turn_left(int spd)
+void backward(int spd)
+{
+  analogWrite (MOTOR2_PIN1, 0);
+  analogWrite (MOTOR2_PIN2, spd);
+  digitalWrite(MOTOR2_ENABLE, HIGH); // L goes bw
+  
+  analogWrite (MOTOR1_PIN1, 0);
+  analogWrite (MOTOR1_PIN2, spd);
+  digitalWrite(MOTOR1_ENABLE, HIGH); // R goes fwd
+}
+
+
+void turn_right(int spd)
 {
   analogWrite (MOTOR2_PIN1, 0);
   analogWrite (MOTOR2_PIN2, spd);
@@ -260,7 +298,7 @@ void turn_left(int spd)
   digitalWrite(MOTOR1_ENABLE, HIGH); // R goes fwds
 }
 
-void turn_right(int spd)
+void turn_left(int spd)
 {
   analogWrite (MOTOR2_PIN1, spd);
   analogWrite (MOTOR2_PIN2, 0);
@@ -305,7 +343,7 @@ int csensor_read_color       (csensor_T cs)
 int csensor_get_reading      (csensor_T cs)
 {
   cs->readings_left --;
-  cs->color_readings[cs->current_color - 1] += digitalRead(CSENSOR);
+  cs->color_readings[cs->current_color - 1] += analogRead(CSENSOR);
   return 0;
 }
 
@@ -347,44 +385,69 @@ int csensor_decide_color     (csensor_T cs)
 {
 
   // TEMPORARY DEBUG CODE
-  float red_reads  = (((float)cs->color_readings[RED -1]))/cs->readings_per_decision;
-  float blue_reads = (((float)cs->color_readings[BLUE-1]))/cs->readings_per_decision;
+  bool red  = (((float)cs->color_readings[RED -1])*2)/(cs->readings_per_decision) > 350;
+  bool blue = (((float)cs->color_readings[BLUE-1])*2)/(cs->readings_per_decision) > 375;
   Serial.print("[B: ");
-  Serial.print(blue_reads);
+  Serial.print(blue);
   Serial.print(" R: ");
-  Serial.print(red_reads);
-  Serial.println("]");
+  Serial.print(red);
+  Serial.print("]");
   
-  
+
+  /*
+  if (      (250 < blue) and (blue < 350)
+        and (350 < red ) and (red < 450)) {
+         Serial.println("RED");
+        cs-> color = RED;
+        return RED;
+  } else if((500 < blue) and (blue < 630)
+        and (270 < red ) and (red < 370)) {
+        Serial.println("BLUE");
+        cs-> color = BLUE;
+        return BLUE;
+  } else if((450 < blue) and (blue < 550)
+        and (510 < red ) and (red < 610)) { 
+        Serial.println("YELLOW");
+        cs-> color = YELLOW;
+        return YELLOW; 
+  } else if((50 < blue) and (blue < 150)
+        and (50 < red ) and (red < 150)) {
+        Serial.println("BLACK");
+        cs-> color = BLACK;
+        return BLACK;  
+  } else {
+      Serial.println("ERR");
+      cs-> color = ERR;
+      return ERR;
+  }
+
+  */
   /* TODO: return the color being sensed 
   int valid_on = (cs-> readings_per_decision >> 1);
   static const int valid_off = 0;
+  */
   
-  if (cs->color_readings[RED-1] == valid_on) {
-      if (cs->color_readings[BLUE-1] == valid_on) {
+  if (red) {
+      if (blue) {
         Serial.println("YELLOW");
         cs-> color = YELLOW;
         return YELLOW;
-      } else if (cs->color_readings[BLUE-1] == valid_off) {
+      } else {
         Serial.println("RED");
         cs-> color = RED;
         return RED;
       }
-  } else if (cs->color_readings[RED-1] == valid_off) {
-      if (cs->color_readings[BLUE-1] == valid_on) {
+  } else {
+      if (blue) {
         Serial.println("BLUE");
         cs-> color = BLUE;
         return BLUE;
-      } else if (cs->color_readings[BLUE-1] == valid_off) {
+      } else {
         Serial.println("BLACK");
         cs-> color = BLACK;
         return BLACK;
       }
   }
-  */
-  
-  Serial.println("ERR");
-  return ERR;
 }
 
 

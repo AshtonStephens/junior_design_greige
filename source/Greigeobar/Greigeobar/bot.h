@@ -5,7 +5,7 @@
 //          pertaining to the autonomous bot
 //
 // Date: 3-3-18 
-// By:  Ashton Stephens and Joseph Ming
+// By:  Ashton Stephens and Joseph Ding
 //
 
 #ifndef BOT_H

@@ -4,7 +4,7 @@
 // Purpose: To define the color sensor system of the autonomous bot
 //
 // Date: 3-3-18 
-// By:  Ashton Stephens and Joseph Ming
+// By:  Ashton Stephens and Joseph Bing
 //
 
 #include "state.h"
