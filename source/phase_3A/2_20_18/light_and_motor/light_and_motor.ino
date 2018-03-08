@@ -1,5 +1,5 @@
-static const int MOTOR1_PIN1   = 8;  // 
-static const int MOTOR1_PIN2   = 9;  //
+static const int MOTOR1_PIN1   = 9;  // 
+static const int MOTOR1_PIN2   = 8;  //
 static const int MOTOR1_ENABLE = 32; //
                                   
 static const int MOTOR2_PIN1   = 7;  //
@@ -164,6 +164,7 @@ ISR(TIMER1_COMPA_vect)
 
 void loop() 
 {
+     stahp();
 
 
   
@@ -237,23 +238,27 @@ void loop()
     Serial.println("SEEN red looking for black");
     forward(75); 
   } 
+  
   timer = start_timer();
-  while (bot.csensor.color != RED && wait_time(timer,3200)) {
+  while (bot.csensor.color != RED && wait_time(timer,2700)) {
+    Serial.println("POOP");
     turn_right(75); 
   }  
-
+  
+  
+/*
   // while we're not on yellow, find path back to red 
   while (bot.csensor.color != YELLOW) {
-    /* 
+    *//* 
      *  GO FORWARD WHILE ON RED
-     */
+     *//*
     if (bot.csensor.color == RED) {
       //Serial.println("ON Red state 2");
       forward(45);
     
     } else if (bot.csensor.color != RED) {
         //Serial.println("correcting");
-
+*/
         /* 
          *  GO BACK
          */
@@ -265,6 +270,7 @@ void loop()
         /* 
          *  TURN RIGHT
          */
+  /*
         timer = start_timer();
         while (wait_time(timer,CORRECTION_TIME_RIGHT) &&
             bot.csensor.color != YELLOW &&
@@ -274,7 +280,7 @@ void loop()
             //Serial.print ( bot.csensor.color );
             turn_right(CORRECTION_SPEED_RIGHT);  
         }
-
+*/
         /* 
          * WHILE I'M TURNING LEFT STAHP IF I HIT
          * THE COLORS I'M LOOKING FOR OR RUN OUT OF TIME
@@ -286,19 +292,22 @@ void loop()
             turn_right(CORRECTION_SPEED_LEFT);  
         }
          */     
-    } else {
+   /* } else {
       stahp();
     }
   }
+ */ 
+  Serial.println("OUT OF big LOOP");
   
-  /*
-  while (bot.csensor.color == RED
-  ){
+  while (bot.csensor.color == RED)
+  {
+    Serial.print("YELLL!!");
     forward(45);
   }
-  */
+ 
   
   while (bot.csensor.color == YELLOW) {
+    //Serial.print("YELLL!!");
     stahp(); 
   }  
 
@@ -451,7 +460,7 @@ void calibrate (float red, float blue)
 int csensor_decide_color     (csensor_T cs)
 {
 
-  bool printy = true;
+  bool printy = false;
   // TEMPORARY DEBUG CODE
   float red_float  = (((float)cs->color_readings[RED -1])*2)/(cs->readings_per_decision);
   float blue_float = (((float)cs->color_readings[BLUE-1])*2)/(cs->readings_per_decision);

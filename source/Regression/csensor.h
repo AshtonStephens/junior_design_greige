@@ -23,6 +23,8 @@ class csensor
     int sensor_pin;    
     int red_pin;
     int blue_pin;
+    int red_light_brighness;
+    int blue_light_brighness;
 
     int led_color_state; // current LED color
    // int readings_left;
@@ -31,16 +33,17 @@ class csensor
     color path_color;
     
     int stabilization_time;
-    int time_of_last_read;     // RENAME WHEN SMARTER
-
+    long long time_of_last_read;     
+    
    public:
     
-    csensor(int sensor_pin, int red_pin, int blue_pin,
-            int readings_per_color, int stabilization_time) :
+    csensor(int sensor_pin, int red_pin, int red_light_brighness, int blue_pin, 
+            int blue_light_brighness, int stabilization_time) :
             sensor_pin(sensor_pin), red_pin(red_pin), blue_pin(blue_pin),
-            led_color_state(0), readings_per_decision(readings_per_color*2),
+            red_light_brighness (red_light_brighness),
+            blue_light_brighness(blue_light_brighness), led_color_state(0), 
             path_color(NONE), stabilization_time(stabilization_time),
-            last_read_time(0) {reset_readings();}
+            time_of_last_read(0) {reset_readings();}
             
     ~csensor();
     
@@ -72,23 +75,23 @@ class csensor
         switch (led_color_state++) {
             case 0:
                 // BOTH off
-                digitalWrite(blue_pin, LOW); 
-                digitalWrite(red_pin, HIGH); 
+                analogWrite(blue_pin, 0); 
+                analogWrite(red_pin , 0); 
                 break;
             case 1:
                 // blue on
-                digitalWrite(blue_pin, LOW); 
-                digitalWrite(red_pin, HIGH); 
+                analogWrite(blue_pin, blue_light_brighness); 
+                analogWrite(red_pin,  0); 
                 break;
             case 2:
                 // BOTH on
-                digitalWrite(blue_pin, LOW); 
-                digitalWrite(red_pin, HIGH); 
+                analogWrite(blue_pin, blue_light_brighness); 
+                analogWrite(red_pin,  red_light_brighness); 
                 break;
             case 3:
                 // red on
-                digitalWrite(blue_pin, LOW); 
-                digitalWrite(red_pin, HIGH); 
+                analogWrite(blue_pin, 0); 
+                analogWrite(red_pin,  red_light_brighness); 
                 led_color_state = 0;
                 break;
             default:
@@ -106,7 +109,6 @@ class csensor
     
     void get_reading ()
     {
-        // readings_left --;
         readings[led_color_state] = analogRead(sensor_pin);
     }
    
