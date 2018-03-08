@@ -4,10 +4,10 @@ static const int MOTOR1_ENABLE = 32; //
                                   
 static const int MOTOR2_PIN1   = 7;  //
 static const int MOTOR2_PIN2   = 6;  //
-static const int MOTOR2_ENABLE = 30; //
+static const int MOTOR2_ENABLE    = 30; //
                                   
-static const int CSENSOR_LED_RED  = 22; //
-static const int CSENSOR_LED_BLUE = 24; //
+static const int CSENSOR_LED_RED  = 5; //
+static const int CSENSOR_LED_BLUE = 4; //
 
 static const int CSENSOR          = A5; //
 
@@ -189,16 +189,17 @@ void loop()
      *  GO FORWARD WHILE ON BLUE
      */
     if (bot.csensor.color == BLUE) {
+      //Serial.println("ON blue state 1");
       forward(75);
-    // else
     
     } else if (bot.csensor.color != RED) {
+        //Serial.println("correcting");
 
         /* 
          *  GO BACK
          */
-     //   timer = start_timer();
-       // while (wait_time(timer, CORRECTION_TIME_BACK)) {
+        // timer = start_timer();
+        // while (wait_time(timer, CORRECTION_TIME_BACK)) {
         //  backward(CORRECTION_SPEED_BACK);   
         //} 
 
@@ -210,46 +211,97 @@ void loop()
             bot.csensor.color != RED &&
             bot.csensor.color != BLUE)
         {
-            turn_left(CORRECTION_SPEED_RIGHT);  
+            //Serial.println("correcting right");
+            //Serial.print ( bot.csensor.color );
+            turn_right(CORRECTION_SPEED_RIGHT);  
         }
 
         /* 
          * WHILE I'M TURNING LEFT STAHP IF I HIT
          * THE COLORS I'M LOOKING FOR OR RUN OUT OF TIME
-         */
+         
         timer = start_timer();
         while (wait_time(timer,CORRECTION_TIME_LEFT) &&
             bot.csensor.color != RED &&
             bot.csensor.color != BLUE) {
             turn_right(CORRECTION_SPEED_LEFT);  
         }
-              
+         */     
     } else {
       stahp();
     }
   }
 
-
-
-  timer = start_timer();
-  while (wait_time(timer,CORRECTION_TIME_RIGHT)) {
-    turn_right(CORRECTION_SPEED_RIGHT);  
-  }
-
-
-  
+  // Hard coded 90degree turn on red
   while (bot.csensor.color != BLACK) {
+    Serial.println("SEEN red looking for black");
     forward(75); 
   } 
-
-  while (bot.csensor.color != RED) {
+  timer = start_timer();
+  while (bot.csensor.color != RED && wait_time(timer,3200)) {
     turn_right(75); 
   }  
-   
+
+  // while we're not on yellow, find path back to red 
+  while (bot.csensor.color != YELLOW) {
+    /* 
+     *  GO FORWARD WHILE ON RED
+     */
+    if (bot.csensor.color == RED) {
+      //Serial.println("ON Red state 2");
+      forward(45);
+    
+    } else if (bot.csensor.color != RED) {
+        //Serial.println("correcting");
+
+        /* 
+         *  GO BACK
+         */
+        // timer = start_timer();
+        // while (wait_time(timer, CORRECTION_TIME_BACK)) {
+        //  backward(CORRECTION_SPEED_BACK);   
+        //} 
+
+        /* 
+         *  TURN RIGHT
+         */
+        timer = start_timer();
+        while (wait_time(timer,CORRECTION_TIME_RIGHT) &&
+            bot.csensor.color != YELLOW &&
+            bot.csensor.color != RED)
+        {
+            //Serial.println("correcting right");
+            //Serial.print ( bot.csensor.color );
+            turn_right(CORRECTION_SPEED_RIGHT);  
+        }
+
+        /* 
+         * WHILE I'M TURNING LEFT STAHP IF I HIT
+         * THE COLORS I'M LOOKING FOR OR RUN OUT OF TIME
+         
+        timer = start_timer();
+        while (wait_time(timer,CORRECTION_TIME_LEFT) &&
+            bot.csensor.color != RED &&
+            bot.csensor.color != BLUE) {
+            turn_right(CORRECTION_SPEED_LEFT);  
+        }
+         */     
+    } else {
+      stahp();
+    }
+  }
+  
+  /*
+  while (bot.csensor.color == RED
+  ){
+    forward(45);
+  }
+  */
+  
   while (bot.csensor.color == YELLOW) {
     stahp(); 
   }  
-  
+
 }
 
 void stahp()
@@ -357,21 +409,26 @@ int csensor_reset_readings   (csensor_T cs)
 
 int csensor_swap_led_color   (csensor_T cs)
 {
+  #define BLUE_LIGHT_BRIGHTNESS 200
+  #define RED_LIGHT_BRIGHTNESS  255
+  #define LIGHT_OFF             0
+  
   if (cs->current_color == BLUE) {
      cs->current_color = RED;
-     digitalWrite(CSENSOR_LED_BLUE, LOW);
-     digitalWrite(CSENSOR_LED_RED, HIGH);
+     analogWrite(CSENSOR_LED_BLUE, LIGHT_OFF);
+     analogWrite(CSENSOR_LED_RED, RED_LIGHT_BRIGHTNESS);
   } else if (cs-> current_color == RED) {
      cs->current_color = BLUE;
-     digitalWrite(CSENSOR_LED_BLUE, HIGH);
-     digitalWrite(CSENSOR_LED_RED,  LOW);
+     analogWrite(CSENSOR_LED_BLUE, BLUE_LIGHT_BRIGHTNESS);
+     analogWrite(CSENSOR_LED_RED,  LIGHT_OFF);
   } else {
-     digitalWrite(CSENSOR_LED_BLUE, LOW);
-     digitalWrite(CSENSOR_LED_RED,  LOW);
+     analogWrite(CSENSOR_LED_BLUE, LIGHT_OFF);
+     analogWrite(CSENSOR_LED_RED,  LIGHT_OFF);
      if (cs-> current_color != BLACK) {
       Serial.write("invalid Csensor color state\n");
      }
   }
+  
   return 0;
 }
 
@@ -381,52 +438,84 @@ int csensor_turn_led_off     (csensor_T cs)
   csensor_swap_led_color(cs);
 }
 
-int csensor_decide_color     (csensor_T cs)
+void calibrate (float red, float blue)
 {
-
-  // TEMPORARY DEBUG CODE
-  bool red  = (((float)cs->color_readings[RED -1])*2)/(cs->readings_per_decision) > 350;
-  bool blue = (((float)cs->color_readings[BLUE-1])*2)/(cs->readings_per_decision) > 375;
   Serial.print("[B: ");
   Serial.print(blue);
   Serial.print(" R: ");
   Serial.print(red);
   Serial.print("]");
-  
+}
 
-  /*
-  if (      (250 < blue) and (blue < 350)
-        and (350 < red ) and (red < 450)) {
-         Serial.println("RED");
+
+int csensor_decide_color     (csensor_T cs)
+{
+
+  bool printy = true;
+  // TEMPORARY DEBUG CODE
+  float red_float  = (((float)cs->color_readings[RED -1])*2)/(cs->readings_per_decision);
+  float blue_float = (((float)cs->color_readings[BLUE-1])*2)/(cs->readings_per_decision);
+  if (printy) calibrate(red_float,blue_float);
+  float red  = (red_float);
+  float blue = (blue_float);
+
+  if (  (blue < 260) and (280 < red )) {
+        if (printy) Serial.println("RED");
         cs-> color = RED;
         return RED;
-  } else if((500 < blue) and (blue < 630)
-        and (270 < red ) and (red < 370)) {
-        Serial.println("BLUE");
+  } else if((240 < blue) and (red < 230)) {
+        if (printy) Serial.println("BLUE");
         cs-> color = BLUE;
         return BLUE;
-  } else if((450 < blue) and (blue < 550)
-        and (510 < red ) and (red < 610)) { 
-        Serial.println("YELLOW");
+  } else if((460 < blue) and (460 < red )) { 
+        if (printy) Serial.println("YELLOW");
         cs-> color = YELLOW;
         return YELLOW; 
-  } else if((50 < blue) and (blue < 150)
-        and (50 < red ) and (red < 150)) {
-        Serial.println("BLACK");
+  } else if((blue < 100) and (red < 100)) {
+        if (printy) Serial.println("BLACK");
         cs-> color = BLACK;
         return BLACK;  
   } else {
-      Serial.println("ERR");
+      if(printy)Serial.println("ERR");
       cs-> color = ERR;
       return ERR;
   }
-
+  
+  /*
+  if (      (180 < blue) and (blue < 240)
+        and (280 < red ) and (red < 380)) {
+        if (printy) Serial.println("RED");
+        cs-> color = RED;
+        return RED;
+  } else if((240 < blue) and (blue < 400)
+        and (120 < red ) and (red < 230)) {
+        if (printy) Serial.println("BLUE");
+        cs-> color = BLUE;
+        return BLUE;
+  } else if((460 < blue) and (blue < 660)
+        and (460 < red ) and (red < 660)) { 
+        if (printy) Serial.println("YELLOW");
+        cs-> color = YELLOW;
+        return YELLOW; 
+  } else if((0 < blue) and (blue < 100)
+        and (0 < red ) and (red < 100)) {
+        if (printy) Serial.println("BLACK");
+        cs-> color = BLACK;
+        return BLACK;  
+  } else {
+      if(printy)Serial.println("ERR");
+      cs-> color = ERR;
+      return ERR;
+  }
   */
+
+  
   /* TODO: return the color being sensed 
   int valid_on = (cs-> readings_per_decision >> 1);
   static const int valid_off = 0;
   */
   
+  /*
   if (red) {
       if (blue) {
         Serial.println("YELLOW");
@@ -447,7 +536,7 @@ int csensor_decide_color     (csensor_T cs)
         cs-> color = BLACK;
         return BLACK;
       }
-  }
+  }*/
 }
 
 
