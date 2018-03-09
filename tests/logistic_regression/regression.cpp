@@ -12,8 +12,9 @@
 static inline float fabs(float a);
 
 int   split (
-        const struct color    Yi[N_REG_MEASUREMENTS],
-        int     Ys[LOG2_BUCKETS][N_REG_MEASUREMENTS])
+        const calibration_data Cd[N_REG_MEASUREMENTS],
+        int     Ys[LOG2_BUCKETS][N_REG_MEASUREMENTS],
+        float     X[N_REG_MEASUREMENTS][N_REG_PARAMS+1])
 {
     // Breaks up the classification of the sepatate classes
     // into binary decisions. Since we have 4 different colors
@@ -23,7 +24,7 @@ int   split (
     // Logically it made sense to break this up into red detect
     // versus blue detect
     for (int i = 0; i < N_REG_MEASUREMENTS; ++i) {
-        switch (Yi[i]) {
+        switch (Cd[i].col) {
             case BLUE:
                 Ys[(int)BLUE][i] = 1;
                 Ys[(int)RED ][i] = 0;
@@ -40,18 +41,23 @@ int   split (
                 Ys[(int)BLUE][i] = 0;
                 Ys[(int)RED ][i] = 0;
                 break;
-            case default:
+            default:
                 Ys[(int)BLUE][i] = 0;
                 Ys[(int)RED ][i] = 0;
                 break;
-        } 
+        }
+        X[i][0] = 1;
+        X[i][1] = Cd[i].none/1023.0;
+        X[i][2] = Cd[i].blue/1023.0;
+        X[i][3] = Cd[i].both/1023.0;
+        X[i][4] = Cd[i].red /1023.0;
     }
 }
 
 color classification (float red, float blue)
 {
     // _____ DEBUG _____
-    Serial.print("{classification}:");
+    /*Serial.print("{classification}:");
     Serial.print("[ R: ");
     Serial.print(red);
     Serial.print("| B: ");
@@ -59,7 +65,7 @@ color classification (float red, float blue)
     Serial.print("]");
     Serial.print("REMEMBER TO REMOVE ALSO DEBUGGG! :)");
     Serial.print("\n");
-
+    */
     // _____ DEBUG _____
     
     if (red) {
@@ -79,18 +85,20 @@ color classification (float red, float blue)
 
 
 float hypothesis (
-        const int Xi[N_REG_PARAMS+1], 
+        const float Xi[N_REG_PARAMS+1], 
         const float Bk[N_REG_PARAMS+1]) 
 {
     // Linear summation of B[i] with X[i]
+    float sum;
     for (int i = 0; i < N_REG_PARAMS; ++i) {
         sum = Bk[i] * Xi[i];
     }
+    return sum;
 }
 
 float Gradient_Descent_Error (
-        int Y[N_REG_MEASYREMENTS],
-        int X[N_REG_MEASUREMENTS][N_REG_PARAMS+1], 
+        int Y[N_REG_MEASUREMENTS],
+        float X[N_REG_MEASUREMENTS][N_REG_PARAMS+1], 
         float Bk[N_REG_PARAMS+1])
 {
     static float Bk_buff [N_REG_PARAMS+1];
@@ -116,6 +124,74 @@ float Gradient_Descent_Error (
     }
     return diff;
 }
+
+//
+// GOOD LOGISTIC REGRESSION
+//
+
+// process: 
+// 
+//  0.) Normalize X
+//  1.) add column with all 1s to X
+//  2.) get corresponding Y
+//  3.) initialize Beta Matrix to 0s
+//  4.) Perform gradient descent to get B
+// 
+//  Gradient Descent
+//  1.) get cost using B X Y
+//  2.) check if change in cost is greated than the convergence necessary
+//  3.) if not then calculate new beta values
+//      -- beta = beta - (lr * log_gradient(beta, X, y))
+//  4.) get old_cost - new_cost and reloop
+//  
+//  Cost Function
+//
+//
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // -------------------------------------------------
 // Helper Functions 

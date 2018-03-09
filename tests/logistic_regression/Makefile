@@ -37,7 +37,7 @@ DEF_FLAGS = $(patsubst %,-D%,$(PROTOCALLS))
 
 EXECUTABLES    = main
 
-MAIN_INCLUDES  = main.o
+MAIN_INCLUDES  = regression2.o
 
 #
 # # # # # # # # # # # # # # # # 

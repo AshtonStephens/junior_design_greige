@@ -16,7 +16,5 @@ enum color {
     NONE   = 4,   ERR = 5
 };
 
-char* print(color c);
-
 #endif 
 
