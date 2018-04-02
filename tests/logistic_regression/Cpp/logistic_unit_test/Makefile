@@ -37,7 +37,7 @@ DEF_FLAGS = $(patsubst %,-D%,$(PROTOCALLS))
 
 EXECUTABLES    = main
 
-MAIN_INCLUDES  = regression2.o
+MAIN_INCLUDES  = main.o
 
 #
 # # # # # # # # # # # # # # # # 
@@ -46,11 +46,6 @@ main: $(MAIN_INCLUDES)
 	$(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS) $(RM_OBJS) 
 main_test: $(patsubst %,%.test,$(MAIN_INCLUDES))
 	$(CC) $(LDFLAGS) -o $@ $(MAIN_INCLUDES) $(LDLIBS) $(RM_OBJS)
-
-times: $(TIMES_INCLUDES)
-	$(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS) $(RM_OBJS) 
-times_test: $(patsubst %,%.test,$(TIMES_INCLUDES))
-	$(CC) $(LDFLAGS) -o $@ $(TIMES_INCLUDES) $(LDLIBS) $(RM_OBJS)
 
 clean: 
 	rm *~ *.swp *.o $(EXECUTABLES) \
