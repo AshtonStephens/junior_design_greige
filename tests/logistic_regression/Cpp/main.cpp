@@ -13,22 +13,20 @@ int main ()
     runr = runb = 0;
 
     long double X[NSEEDS][NPARAMS];
-    long double B[2][NPARAMS]=
-    {{-3.32670946,-2.86213196,3.12579925,7.75872969,2.74096391},
-     {-3.13729316,7.70683227,3.70814991,-3.34599704,2.24076771}};
+    long double B[2][NPARAMS];
     long double Y[2][NSEEDS];
+    float learning_rate = 0.0001;
+    float precision     = 0.0001;
+    float accuracy_sum  = 0.0;
+
+    // allocates the seed data
+    split(C1,Y,X); 
     
     for (int i = 0; i < NPARAMS; ++i) {
         B[0][i] = 0;
         B[1][i] = 0;
     }
     
-    float learning_rate = 0.0001;
-    float precision     = 0.0001;
-    float accuracy_sum  = 0.0;
-
-    split(C1,Y,X);    
-
     gradient_descent(Y[(int)BLUE],X,B[(int)BLUE],learning_rate,precision, runb);
     print_beta(stderr,BLUE,B[(int)BLUE]);  
     fprintf   (stderr,"\n");
@@ -46,6 +44,7 @@ int main ()
     accuracy_sum += accuracy(stderr,C5,B); 
     accuracy_sum += accuracy(stderr,C6,B); 
     accuracy_sum += accuracy(stderr,C7,B); 
+
     fprintf(stderr,"accuracy total = %f\n",accuracy_sum/7);
 }
 
