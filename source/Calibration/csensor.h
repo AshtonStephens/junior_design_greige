@@ -9,12 +9,12 @@
 
 
 #ifndef CSENSOR_H
-#define CSENSOR_H
+#define CSENSOR_H 
 
 #include "color.h"
 #include "regression2.h"
 
-#define PRINTME true
+#define PRINTME false
 
 class csensor 
 {
@@ -93,23 +93,24 @@ class csensor
     void switch_led_color ()
     {
         switch (led_color_state++) {
+          
             case 0:
-                // BOTH off
+                // BOTH off [1]
                 analogWrite(blue_pin, 0); 
                 analogWrite(red_pin , 0); 
                 break;
             case 1:
-                // blue on
+                // blue on [2]
                 analogWrite(blue_pin, blue_light_brighness); 
                 analogWrite(red_pin,  0); 
                 break;
             case 2:
-                // BOTH on
-                analogWrite(blue_pin, blue_light_brighness); 
-                analogWrite(red_pin,  red_light_brighness); 
+                // BOTH on [3]
+                analogWrite(blue_pin, 0); 
+                analogWrite(red_pin,  0 ); 
                 break;
             case 3:
-                // red on
+                // red on [0]
                 analogWrite(blue_pin, 0); 
                 analogWrite(red_pin,  red_light_brighness); 
                 led_color_state = 0;
@@ -135,7 +136,7 @@ class csensor
     color decide_color  ()
     {
         // ----------------------------- TEMPORARY DEBUG CODE -----------------
-        //if (PRINTME) print_readings (); 
+        if (PRINTME) print_readings (); 
         
         return NONE;
     }
@@ -143,13 +144,13 @@ class csensor
     void print_readings() 
     {
         Serial.print("{csensor}:");
-        Serial.print("[ __: ");
+        Serial.print("[ _R: ");
         Serial.print(readings[0]);
-        Serial.print(" | B_: ");
+        Serial.print(" | __: ");
         Serial.print(readings[1]);
-        Serial.print(" | BR: ");
+        Serial.print(" | B_: ");
         Serial.print(readings[2]);
-        Serial.print(" | _R: ");
+        Serial.print(" | BR: ");
         Serial.print(readings[3]);
         Serial.print(" ]");
         Serial.print("\n");

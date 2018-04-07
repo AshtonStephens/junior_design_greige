@@ -22,7 +22,7 @@ float logistic (
         const float X[NPARAMS], 
         const float B[NPARAMS+1])
 {
-    return ((float)1.0) / (1 + exp(-h(X,B)));
+    return ((float)1.0) / (1 + exp(-hypothesis(X,B)));
 }
 
 bool predict_component(const float X[NPARAMS], const float B[NPARAMS+1]) 

@@ -9,7 +9,7 @@
 #define CLASSIFICATION_H
 
 #include "color.h"
-#include <math.h>
+#include "math.h"
 
 #define NPARAMS 4
 

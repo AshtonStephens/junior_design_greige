@@ -18,10 +18,18 @@ const float bluBsl[NPARAMS+1] ={-1.900788, -0.087606, 0.029076, 3.875049, 0.0350
 const float redBsr[NPARAMS+1] ={-0.925573, 3.758495, 0.050483, -0.110437, 0.045874};
 const float bluBsr[NPARAMS+1] ={-1.812837, 0.007340, 0.001000, 3.970372, 0.027169};
 
-csensor sensor(
-    SENSOR_PIN_L, SENSOR_PIN_R,
-    RED_LED_PIN, BLUE_LED_PIN, STABILIZATION_TIME,
-    redBsl,bluBsl,redBsr,bluBsr);
+csensor sensor_l( 0,
+    SENSOR_PIN_L,
+    RED_LED_PIN,  RED_LIGHT_BRIGHTNESS,
+    BLUE_LED_PIN, BLUE_LIGHT_BRIGHTNESS,
+    STABILIZATION_TIME,redBsl,bluBsl);
+
+csensor sensor_r( 1,
+    SENSOR_PIN_R,
+    RED_LED_PIN,  RED_LIGHT_BRIGHTNESS,
+    BLUE_LED_PIN, BLUE_LIGHT_BRIGHTNESS,
+    STABILIZATION_TIME,redBsr,bluBsr);
+ 
 
 void setup() {
   // put your setup code here, to run once:
@@ -33,5 +41,5 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   // sensor_l.sense();
-  sensor.sense();
+  sensor_r.sense();
 }

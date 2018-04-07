@@ -14,12 +14,15 @@
 #include "color.h"
 #include "classification.h"
 
+// MAKE MORE PROMINENT
+typedef float Betas[NPARAMS+1];
 #define DEBUG_CSENSOR
 
 class csensor 
 {
   private:
   
+    int id_number;
     int sensor_pin;    
     int red_pin;
     int blue_pin;
@@ -34,14 +37,14 @@ class csensor
     long long time_of_last_read;     
     
     // Beta values for logistic classification
-    float redB [NPARAMS];
-    float bluB [NPARAMS];
+    const Betas &redB;
+    const Betas &bluB;
 
     public:
     
-    csensor(int sensor_pin, int red_pin, int red_light_brightness, int blue_pin,
+    csensor(int id_number, int sensor_pin, int red_pin, int red_light_brightness, int blue_pin,
             int blue_light_brightness, int stabilization_time, 
-            float redB[NPARAMS], float bluB[NPARAMS]) :
+            const Betas &redB, const Betas &bluB) : id_number(id_number),
             sensor_pin(sensor_pin), red_pin(red_pin), blue_pin(blue_pin),
             red_light_brightness (red_light_brightness),
             blue_light_brightness(blue_light_brightness), led_color_state(0), 
@@ -123,7 +126,27 @@ class csensor
         new_color = predict_full(readings,redB,bluB); 
 
         #ifdef DEBUG_CSENSOR 
-            
+        Serial.print("ID: ");
+        Serial.print(id_number);
+        Serial.print(" - [");
+        switch (new_color) {
+          case BLUE :
+            Serial.print("BLUE");
+            break;
+          case RED :
+            Serial.print("RED");
+            break;
+          case YELLOW :
+            Serial.print("YELLOW");
+            break;
+          case BLACK :
+            Serial.print("BLACK");
+            break;  
+          default :
+            Serial.print("IMPOSSIBLE");
+            break;
+        }
+        Serial.println("]");
         #endif
         
         return new_color;
