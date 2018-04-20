@@ -21,55 +21,65 @@ typedef float Betas[NPARAMS+1];
 class csensor 
 {
   private:
-  
-    int id_number;
-    int sensor_pin;    
+
+    int sensor_pin_left;
+    int sensor_pin_right;
+      
     int red_pin;
     int blue_pin;
-    int red_light_brightness;
-    int blue_light_brightness;
 
     int   led_color_state; // current LED color
-    float readings[NPARAMS];
-    color path_color;
+    float readings_left [NPARAMS];
+    float readings_right[NPARAMS];
+
+    color color_left;
+    color color_right;
     
     int stabilization_time;
     long long time_of_last_read;     
     
     // Beta values for logistic classification
-    const Betas &redB;
-    const Betas &bluB;
+    const Betas &redB_left;
+    const Betas &bluB_left;
+    const Betas &redB_right;
+    const Betas &bluB_right;
 
     public:
     
-    csensor(int id_number, int sensor_pin, int red_pin, int red_light_brightness, int blue_pin,
-            int blue_light_brightness, int stabilization_time, 
-            const Betas &redB, const Betas &bluB) : id_number(id_number),
-            sensor_pin(sensor_pin), red_pin(red_pin), blue_pin(blue_pin),
-            red_light_brightness (red_light_brightness),
-            blue_light_brightness(blue_light_brightness), led_color_state(0), 
-            path_color(NONE), stabilization_time(stabilization_time),
-            time_of_last_read(0), redB(redB), bluB(bluB) {reset_readings();}
+    csensor(int sensor_pin_left, int sensor_pin_right,int red_pin, int blue_pin, 
+            int stabilization_time, 
+            const Betas &redB_left , const Betas &bluB_left,
+            const Betas &redB_right, const Betas &bluB_right) : 
+            sensor_pin_right(sensor_pin_right), sensor_pin_left(sensor_pin_left), 
+            red_pin(red_pin), blue_pin(blue_pin), led_color_state(0), 
+            color_left(NONE),color_right(NONE), 
+            stabilization_time(stabilization_time), time_of_last_read(0), 
+            redB_left (redB_left ), bluB_left (bluB_left ),
+            redB_right(redB_right), bluB_right(bluB_right)
+            {reset_readings();}
 
     ~csensor(){};
-    
-    // 
+
     void sense ()
     {
         if (stabilization_time < millis() - time_of_last_read) {
             time_of_last_read = millis();
-            get_reading();
+            get_readings();
             switch_led_color();
             if (led_color_state == 0) {
-                path_color = decide_color();
+                decide_colors ();
                 reset_readings();
             }
         }
     }
 
     // returns last decided path color
-    color path() {
-        return path_color;  
+    color right() {
+        return color_right;  
+    }
+    
+    color left() {
+        return color_left;  
     }
     
     private:
@@ -86,22 +96,21 @@ class csensor
                 break;
             case 1:
                 // blue on
-                analogWrite(blue_pin, blue_light_brightness); 
+                analogWrite(blue_pin, 255); 
                 analogWrite(red_pin,  0); 
                 break;
             case 2:
                 // BOTH on
-                analogWrite(blue_pin, blue_light_brightness); 
-                analogWrite(red_pin,  red_light_brightness); 
+                analogWrite(blue_pin, 255); 
+                analogWrite(red_pin,  255); 
                 break;
             case 3:
                 // red on
                 analogWrite(blue_pin, 0); 
-                analogWrite(red_pin,  red_light_brightness); 
+                analogWrite(red_pin,  255); 
                 led_color_state = 0;
                 break;
             default:
-                // SHOULD NEVER HAPPEN
                 break;
         }
     }
@@ -109,27 +118,37 @@ class csensor
     void reset_readings ()
     {
         for (int i = 0; i < 4; ++i) {
-            readings[i] = 0;
+            readings_left [i] = 0;
+            readings_right[i] = 0;
         }
     }
     
-    void get_reading ()
+    void get_readings ()
     {
-        readings[led_color_state] = analogRead(sensor_pin) / 1023.0;
+        readings_right[led_color_state] = analogRead(sensor_pin_right) / 1023.0;
+        readings_left [led_color_state] = analogRead(sensor_pin_left ) / 1023.0;
     }
    
-    color decide_color  ()
+    void decide_colors  ()
     {
         // ----------------------------- TEMPORARY DEBUG CODE -----------------
         color new_color;
 
-        new_color = predict_full(readings,redB,bluB); 
+        color_left  = predict_full(readings_left ,redB_left ,bluB_left ); 
+        color_right = predict_full(readings_right,redB_right,bluB_right); 
 
         #ifdef DEBUG_CSENSOR 
-        Serial.print("ID: ");
-        Serial.print(id_number);
-        Serial.print(" - [");
-        switch (new_color) {
+        Serial.print("[");
+        print_color(color_left);
+        Serial.print("][");
+        print_color(color_right);
+        Serial.println("]");
+        #endif
+    }
+    
+    void print_color  (color c)
+    {
+        switch (c) {
           case BLUE :
             Serial.print("BLUE");
             break;
@@ -146,13 +165,9 @@ class csensor
             Serial.print("IMPOSSIBLE");
             break;
         }
-        Serial.println("]");
-        #endif
-        
-        return new_color;
     }
 
-    void print_readings() 
+    void print_readings(float readings[NPARAMS]) 
     {
         Serial.print("{csensor}:");
         Serial.print("[ __: ");

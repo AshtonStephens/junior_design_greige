@@ -145,7 +145,7 @@ class driveSystem{
   long getDriveTime(){return motorModeTime;}
   
 };
-driveSystem d1(7,6,8,9);
+driveSystem d1(0,1,2,3);
 SmartLED led10(10);
 SmartLED led11(11);
 SmartLED led12(12);
@@ -157,8 +157,10 @@ long em = 0; // time when starting case 3 (fixed)
 long cm = 0; // current time in case 3 (constantly updated)
 
 void setup(){
-  pinMode(2, INPUT_PULLUP);
-  pinMode(3, INPUT_PULLUP);
+  pinMode(0, OUTPUT); 
+  pinMode(1, OUTPUT); 
+  pinMode(2, OUTPUT);
+  pinMode(3, OUTPUT);
   pinMode(6, OUTPUT); 
   pinMode(7, OUTPUT); 
   pinMode(8, OUTPUT); 
@@ -168,7 +170,7 @@ void setup(){
   state = 0;
   subStateCount = 0;
   }
- 
+ #define SPEED_ 50
 void loop(){
     switch (state){
       //__________________________________________________________________
@@ -176,10 +178,10 @@ void loop(){
       led11.updateLed(200);
       updateAllLeds();
       d1.updateDrive();
-      if(subStateCount == 0){d1.setDriveTime(1000,150,3); state = 3;}  //drive forward 5 sec
-      if(subStateCount == 1){d1.setDriveTime(1000,150,2); state = 3;}  //turn left 3 sec
-      if(subStateCount == 2){d1.setDriveTime(1000,150,4); state = 3;}  //turn right 3 sec
-      if(subStateCount == 3){d1.setDriveTime(1000,150,1); state = 3;}  //turn right 3 sec
+      if(subStateCount == 0){d1.setDriveTime(1000,SPEED_,3); state = 3;}  //drive forward 5 sec
+      if(subStateCount == 1){d1.setDriveTime(1000,SPEED_,2); state = 3;}  //turn left 3 sec
+      if(subStateCount == 2){d1.setDriveTime(1000,SPEED_,4); state = 3;}  //turn right 3 sec
+      if(subStateCount == 3){d1.setDriveTime(1000,SPEED_,1); state = 3;}  //turn right 3 sec
       break;
       //___________________________________________________________________
       case 1: break; //OFF STATE (NO LEDS)

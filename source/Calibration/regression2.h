@@ -14,6 +14,7 @@
 #define NPARAMS 4
 #define NSEEDS  16
 
+
 struct calibration_data 
 {
    color col;

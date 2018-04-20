@@ -16,7 +16,7 @@ int main ()
     long double B[2][NPARAMS];
     long double Y[2][NSEEDS];
     float learning_rate = 0.0001;
-    float precision     = 0.0001;
+    float precision     = 0.00001;
     float accuracy_sum  = 0.0;
 
     // allocates the seed data
@@ -38,14 +38,14 @@ int main ()
     //fprintf   (stderr,"\033[31mred(%d) \033[34mblue(%d)\033[0m\n",runr, runb);
     
     accuracy_sum += accuracy(stderr,C1,B); 
-    accuracy_sum += accuracy(stderr,C2,B); 
+/*    accuracy_sum += accuracy(stderr,C2,B); 
     accuracy_sum += accuracy(stderr,C3,B); 
     accuracy_sum += accuracy(stderr,C4,B); 
     accuracy_sum += accuracy(stderr,C5,B); 
     accuracy_sum += accuracy(stderr,C6,B); 
     accuracy_sum += accuracy(stderr,C7,B); 
-
-    fprintf(stderr,"accuracy total = %f\n",accuracy_sum/7);
+*/
+    fprintf(stderr,"accuracy total = %f\n",accuracy_sum);
 }
 
 
