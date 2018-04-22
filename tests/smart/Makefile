@@ -40,11 +40,11 @@ DEF_FLAGS = $(patsubst %,-D%,$(PROTOCALLS))
 # 	|	|	|
 # 	V	V	V
 
-all: main test 
+all: main
 
 EXECUTABLES = main test  
 
-MAIN_INCLUDES  = main.o debug_macros.o
+MAIN_INCLUDES  = main.o fake_arduino.o debug_macros.o
 TEST_INCLUDES  = test.o fake_arduino.o debug_macros.o
 
 main: $(MAIN_INCLUDES)
