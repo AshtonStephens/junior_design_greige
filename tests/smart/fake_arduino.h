@@ -37,11 +37,13 @@ struct serialport
 extern long long millis();
 
 extern void pinMode_func (
-        const std::string pin, 
+        const std::string pin_name, 
         const int pin_num, 
-        const arduino_pintype);
+        const arduino_pintype pin);
 
-extern void analogWrite (int pin, int write);
+extern void analogWrite  (int pin, int write);
+extern void digitalWrite (int pin, int write);
+extern void printPins    ();
 
 extern void init_fake_ports ();
 

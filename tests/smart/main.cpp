@@ -49,6 +49,7 @@
 void setup ()
 {
 
+    init_fake_ports(); // FOR DEBUGGING 
 /* ----------------------------------------------- *
  *  PINMODE SETUPS
  * ----------------------------------------------- */
@@ -99,7 +100,9 @@ void loop ()
 {
     millis();
     Serial.println(" ---- STARTING TESTS ---- ");
-    
+    printPins(); 
+
+    printPins(); 
 
     Serial.println(" ---- ENDING TESTS ---- ");
     for (;;) {DBG_ASSERT(false);};
