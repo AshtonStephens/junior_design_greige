@@ -7,14 +7,12 @@
  *  Date: 3/8/18
  */
  
-#define CALIBRATION_PIN 18 
-#define BLUE_LED_PIN 5
-#define  RED_LED_PIN 6
+#define CALIBRATION_PIN 21
+#define BLUE_LED_PIN 28
+#define  RED_LED_PIN 29
 
-#define   SENSOR_PIN A6
+#define   SENSOR_PIN A7
 
-#define BLUE_LIGHT_BRIGHTNESS 255
-#define RED_LIGHT_BRIGHTNESS  255
 #define STABILIZATION_TIME 50
 
 #include "regression2.h"
@@ -29,8 +27,8 @@ void regression_print(
 
 csensor sensor(
     SENSOR_PIN,
-    RED_LED_PIN,  RED_LIGHT_BRIGHTNESS,
-    BLUE_LED_PIN, BLUE_LIGHT_BRIGHTNESS,
+    RED_LED_PIN,
+    BLUE_LED_PIN,
     STABILIZATION_TIME);
     
 void calibrate () 

@@ -35,8 +35,8 @@ class csensor
     
    public:
     
-    csensor(int sensor_pin, int red_pin, int red_light_brighness, int blue_pin, 
-            int blue_light_brighness, int stabilization_time) :
+    csensor(int sensor_pin, int red_pin, int blue_pin, 
+            int stabilization_time) :
             sensor_pin(sensor_pin), red_pin(red_pin), blue_pin(blue_pin),
             red_light_brighness (red_light_brighness),
             blue_light_brighness(blue_light_brighness), led_color_state(0), 
@@ -96,23 +96,23 @@ class csensor
           
             case 0:
                 // BOTH off [1]
-                analogWrite(blue_pin, 0); 
-                analogWrite(red_pin , 0); 
+                digitalWrite(blue_pin, LOW); 
+                digitalWrite(red_pin , LOW); 
                 break;
             case 1:
                 // blue on [2]
-                analogWrite(blue_pin, 255); 
-                analogWrite(red_pin,  0); 
+                digitalWrite(blue_pin, HIGH); 
+                digitalWrite(red_pin,  LOW); 
                 break;
             case 2:
                 // BOTH on [3]
-                analogWrite(blue_pin, 255); 
-                analogWrite(red_pin,  255 ); 
+                digitalWrite(blue_pin, HIGH); 
+                digitalWrite(red_pin,  HIGH ); 
                 break;
             case 3:
                 // red on [0]
-                analogWrite(blue_pin, 0); 
-                analogWrite(red_pin,  255); 
+                digitalWrite(blue_pin, LOW); 
+                digitalWrite(red_pin,  HIGH); 
                 led_color_state = 0;
                 break;
             default:

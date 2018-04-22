@@ -10,6 +10,66 @@
 #ifndef MOTOR_H
 #define MOTOR_H
 
+#define CURRENT_SPEED 1000
+
+class smart_motor
+{
+ private:
+  int pin1;
+  int pin2;
+  int current_speed;
+  int final_speed;
+  int coeff;
+  long long last_update;
+public:
+  smart_motor (int pin1, int pin2) :
+              pin1(pin1), pin2(pin2),
+              coeff(1), final_speed(0),
+              current_speed(0), last_update(0) {}
+
+  // TODO: add diff function options
+  set_transition (int start_speed, int end_speed,
+                  int coefficient)
+  {
+
+    // validates slope
+    if ((start_speed < end_speed && coeff < 0) ||
+        (start_speed > end_speed && coeff > 0)) {
+      coefficient = -coefficient; 
+    }
+
+    // allows for current speed to be used
+    if(start_speed != CURRENT_SPEED)
+      current_speed = start_speed;
+
+    coeff = coefficient;
+    final_speed = end_speed;
+    maintain_motor();
+  }
+
+  maintain_motor () 
+  { 
+    long long update_time = millis();
+    current_speed += ((float)coeff/1000) * (update_time - last_update);
+    forward(current_speed);
+    last_update = update_time;
+  }
+  
+  void forward (int spd) {
+        if (spd < 0) return backward(-spd);
+        analogWrite (pin1, spd);
+        analogWrite (pin2, 0);
+      }
+      
+  void backward (int spd) {
+    if (spd < 0) return forward(-spd);
+    analogWrite (pin1, 0);
+    analogWrite (pin2, spd);
+  }
+  
+ 
+};
+
 class motor 
 {
   private:
