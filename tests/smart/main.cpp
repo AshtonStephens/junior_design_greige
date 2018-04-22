@@ -46,6 +46,11 @@
 #define PIN1_M2 5  // ?
 #define PIN2_M2 4  // ?
 
+
+
+smart_motor lmotor (PIN1_M1, PIN2_M1) ;
+
+
 void setup ()
 {
 
@@ -94,18 +99,18 @@ void setup ()
 
 }
 
-smart_motor lmotor () ;
 
 void loop ()
 {
     millis();
-    Serial.println(" ---- STARTING TESTS ---- ");
     printPins(); 
+    analogWrite(PIN1_M1,100);
+    
 
-    printPins(); 
 
-    Serial.println(" ---- ENDING TESTS ---- ");
-    for (;;) {DBG_ASSERT(false);};
+    
+
+    //for (;;) {DBG_ASSERT(false);};
 }
 
 /* --------------------------------------------------------------- */

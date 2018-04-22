@@ -12,10 +12,13 @@
 #ifndef SMART_MOTOR_H
 #define SMART_MOTOR_H
 
+#include "fake_arduino.h"
+
 #define MAX_MOTOR_SPEED 255
 #define MIN_MOTOR_SPEED -255
 
 #define CURRENT_SPEED   500
+
 
 enum motor_transition
 {

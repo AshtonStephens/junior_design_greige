@@ -10,6 +10,8 @@
 
 #define NUM_PINS_ARDUINO_ADK 70
 
+long long LAST_PORT_PRINT = 0;
+
 /* --------------------------------------------- */
 /* -- Arduino Pin Tracker ---------------------- */
 /* --------------------------------------------- */
@@ -44,27 +46,21 @@ extern void pinMode_func (
         const arduino_pintype pintype)
 {
     DBG_ASSERT(pins[pin_num] == NULL);
-    DBG;
     pins[pin_num] = new ArduinoPin 
         (pintype,pin_name,pin_num);
     std::cerr << pin_num << std::endl;
-/*
-    std::cerr << " [";
-    switch ()
-        std::cerr << "\033[34m" << type;
-    } else if ("INPUT" == type) {
-        std::cerr << "\033[33m" <<  type;
-    } else if ("INPUT_PULLUP" == type) {
-        std::cerr << "\033[32m" <<  type;
-    } else {
-        std::cerr << "\033[31m" << type;
-    }
-    std::cerr << "\033[0m]\t" << pin << std::endl;
-*/
 }
 
+#define PRINT_DELAY 30
 extern void printPins    ()
 {
+    static long long last_print = 0;
+    if (millis()-last_print <= PRINT_DELAY) return; 
+    last_print = millis();
+
+    std::cerr << std::endl << "\033[2J|";
+    for (int i = 0; i < 60; ++i) std::cerr << "-";
+    std::cerr << "|" << std::endl;
     for (int i = 0; i < NUM_PINS_ARDUINO_ADK; ++i) {
         if (pins[i] != NULL) {
             std::cerr << "[";
@@ -73,7 +69,19 @@ extern void printPins    ()
             } else {
                 std::cerr << "A" << i - 55 ;
             }
-            std::cerr << "][";
+
+            std::cerr << "] ";
+            if (pins[i]->digital) {
+                if (!!(pins[i]->value)) {
+                    std::cerr << "\033[1mHIGH\033[0m";
+                } else {
+                    std::cerr << "\033[2mLOW\033[0m";
+                }
+            } else {
+                std::cerr << "\033[36m" << pins[i]->value << "\033[0m";
+            }
+
+            std::cerr << " [";
             switch (pins[i]->pintype) {
                 case INPUT:
                     std::cerr << "\033[34mINPUT";
@@ -86,16 +94,8 @@ extern void printPins    ()
                     break;
             }
             std::cerr << "\033[0m]\t";
-            if (pins[i]->digital) {
-                if (!!(pins[i]->value)) {
-                    std::cerr << "HIGH";
-                } else {
-                    std::cerr << "LOW";
-                }
-            } else {
-                std::cerr << pins[i]->value;
-            }
-            std::cerr << std::endl;
+
+            std::cerr << "   " << pins[i]-> name << std::endl;
         }    
     }
 }
