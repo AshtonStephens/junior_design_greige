@@ -9,6 +9,7 @@
 #define SMART_STATE_H
 
 #include "smart_motor.h"
+#include "state_machine.h"
 #include "csensor.h"
 #include "color.h"
 
@@ -17,8 +18,8 @@ class smart_bot
 public:
     smart_motor rmotor;
     smart_motor lmotor;
-    csensor     color_sensor;
-    state_machine ;
+    csensor     sensors;
+    state_machine bot_state_machine;
 
     smart_bot(
         // MOTORS
@@ -34,10 +35,11 @@ public:
             sensors(sensor_pin_left,sensor_pin_right,
                     red_pin, blue_pin, stabilization_time,
                     redB_left,bluB_left,redB_right,bluB_right) {}
-        
-    void run (int routine) 
+       
+    template <int N> 
+    void run (state_initializer (&si)[N],int routine) 
     {
-        bot_state_machine.setup(routine);
+        bot_state_machine.setup(si,routine);
 
         while (!bot_state_machine.complete()) {
             maintain_hardware();
@@ -55,9 +57,9 @@ public:
 
     void poll_sensors ()
     {
-        color_sensor.sense(); 
+        sensors.sense(); 
     }
-}
+};
 
 #endif
 

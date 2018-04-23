@@ -1,6 +1,10 @@
 #include "fake_arduino.h"
 #include "smart_bot.h"
 
+#include "states.h"
+#include "smart_motor.h"
+
+
 #define DEBUG
 #include "debug_macros.h"
 
@@ -51,7 +55,18 @@
 #define DEBUG2 32
 #define DEBUG3 33
 
-smart_motor lmotor (PIN1_M1, PIN2_M1) ;
+#define STABILIZATION_TIME 50
+
+const float redBsl[NPARAMS+1] ={-1.903868, 3.080066, 1.502316, -0.705124, 0.515389};
+const float bluBsl[NPARAMS+1] ={-2.091942, -0.156429, -0.035497, 3.392170, 0.478369};
+const float redBsr[NPARAMS+1] = {-1.840674, 3.160087, 1.472051, -0.787523, 0.539282};
+const float bluBsr[NPARAMS+1] = {-2.182819, -0.093342, 0.034828, 3.400515, 0.624078};
+
+smart_bot Bot ( PIN1_M1, PIN2_M1,
+                PIN1_M2, PIN2_M2,
+                L_LIGHT_SENSOR, R_LIGHT_SENSOR,
+                RED_LED, BLUE_LED, STABILIZATION_TIME,
+                redBsl, bluBsl, redBsr, bluBsr);
 
 void setup ()
 {
@@ -107,17 +122,13 @@ void setup ()
 
 }
 
-
 void loop ()
 {
     millis();
     printPins(); 
-    lmotor.maintain(); 
-    if (lmotor.at_final_speed()) {
-        lmotor.set_transition(100,-100,5000,LINEAR_DURATION);
-    }
     
-
+    Bot.run(STATE_PROGRAM,0);
+     
     //for (;;) {DBG_ASSERT(false);};
 }
 

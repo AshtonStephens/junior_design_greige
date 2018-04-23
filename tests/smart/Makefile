@@ -44,8 +44,8 @@ all: main
 
 EXECUTABLES = main test  
 
-MAIN_INCLUDES  = main.o fake_arduino.o debug_macros.o
-TEST_INCLUDES  = test.o fake_arduino.o debug_macros.o
+MAIN_INCLUDES  = test.o fake_arduino.o debug_macros.o classification.o 
+TEST_INCLUDES  = test.o fake_arduino.o debug_macros.o classification.o 
 
 main: $(MAIN_INCLUDES)
 	$(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS) $(RM_OBJS) 
