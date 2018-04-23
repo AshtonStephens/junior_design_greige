@@ -1,5 +1,5 @@
 #include "fake_arduino.h"
-#include "smart_motor.h"
+#include "smart_bot.h"
 
 #define DEBUG
 #include "debug_macros.h"
@@ -46,10 +46,12 @@
 #define PIN1_M2 5  // ?
 #define PIN2_M2 4  // ?
 
-
+#define DEBUG0 30
+#define DEBUG1 31
+#define DEBUG2 32
+#define DEBUG3 33
 
 smart_motor lmotor (PIN1_M1, PIN2_M1) ;
-
 
 void setup ()
 {
@@ -97,6 +99,12 @@ void setup ()
     pinMode( PIN1_M2 , OUTPUT); // ?
     pinMode( PIN2_M2 , OUTPUT); // ?
 
+    // DEBUGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG
+    pinMode( DEBUG0 , DEBUG_); // ?
+    pinMode( DEBUG1 , DEBUG_); // ?
+    pinMode( DEBUG2 , DEBUG_); // ?
+    pinMode( DEBUG3 , DEBUG_); // ?
+
 }
 
 
@@ -104,10 +112,10 @@ void loop ()
 {
     millis();
     printPins(); 
-    analogWrite(PIN1_M1,100);
-    
-
-
+    lmotor.maintain(); 
+    if (lmotor.at_final_speed()) {
+        lmotor.set_transition(100,-100,5000,LINEAR_DURATION);
+    }
     
 
     //for (;;) {DBG_ASSERT(false);};

@@ -56,7 +56,6 @@ public:
     // returns true if the motor has achieved the final speed
     bool at_final_speed () 
     {return final_speed == current_speed;}
-
     void maintain ()
     {
         int ds;
@@ -88,7 +87,7 @@ public:
         } else if (ds < 0 && new_speed < final_speed) {
             new_speed = final_speed;
         }
-
+        
         current_speed = motor_go(new_speed);
         last_update = current_update;
     }
@@ -96,7 +95,7 @@ public:
     void set_transition (int current_speed_, int final_speed_, 
             int constant, motor_transition transition_)
     {
-        if (current_speed != CURRENT_SPEED) // checks against flag
+        if (current_speed_ != CURRENT_SPEED) // checks against flag
             this-> current_speed = force_into_range(current_speed_); 
         this-> final_speed = force_into_range (final_speed_);
         this-> transition    = transition_;
@@ -131,13 +130,11 @@ private:
         if (speed > 0) {
             analogWrite (pin1, speed);
             analogWrite (pin2, 0);
-            std::cerr << "SPEED OUTPUT : " <<  speed << std::endl;
             return speed;
         } else {
             speed = -speed;   
             analogWrite (pin1, 0);
             analogWrite (pin2, speed);
-            std::cerr << "SPEED OUTPUT : " <<  -speed << std::endl;
             return -speed;
         }
     }

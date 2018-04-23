@@ -22,7 +22,8 @@ enum arduino_pintype
 {
     INPUT = 0,
     INPUT_PULLUP = 1,
-    OUTPUT =  2
+    OUTPUT =  2,
+    DEBUG_  =  3
 };
 
 struct serialport 
@@ -42,7 +43,10 @@ extern void pinMode_func (
         const arduino_pintype pin);
 
 extern void analogWrite  (int pin, int write);
+extern int  analogRead   (int pin);
 extern void digitalWrite (int pin, int write);
+extern int  digitalRead  (int pin);
+
 extern void printPins    ();
 
 extern void init_fake_ports ();

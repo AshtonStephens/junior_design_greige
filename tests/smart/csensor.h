@@ -4,7 +4,7 @@
 // Purpose: To define the color sensor system of the autonomous bot
 //
 // Date: 3-3-18 
-// By:  Ashton Stephens and Joseph Bing
+// By:  Ashton Stephens
 //
 
 
@@ -46,11 +46,11 @@ class csensor
 
     public:
     
-    csensor(int sensor_pin_left, int sensor_pin_right,int red_pin, int blue_pin, 
+    csensor(int sensor_pin_left, int sensor_pin_right,int red_pin, int blue_pin,
             int stabilization_time, 
             const Betas &redB_left , const Betas &bluB_left,
             const Betas &redB_right, const Betas &bluB_right) : 
-            sensor_pin_right(sensor_pin_right), sensor_pin_left(sensor_pin_left), 
+            sensor_pin_left(sensor_pin_left), sensor_pin_right(sensor_pin_right),
             red_pin(red_pin), blue_pin(blue_pin), led_color_state(0), 
             color_left(NONE),color_right(NONE), 
             stabilization_time(stabilization_time), time_of_last_read(0), 
@@ -132,8 +132,6 @@ class csensor
     void decide_colors  ()
     {
         // ----------------------------- TEMPORARY DEBUG CODE -----------------
-        color new_color;
-
         color_left  = predict_full(readings_left ,redB_left ,bluB_left ); 
         color_right = predict_full(readings_right,redB_right,bluB_right); 
 
