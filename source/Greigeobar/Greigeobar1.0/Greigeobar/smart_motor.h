@@ -111,6 +111,14 @@ public:
         last_update = current_update;
     }
 
+    void debug () 
+    {
+        DBG;
+        _VAR(current_speed);
+        _VAR(final_speed);
+        _VAR(coeff);
+    }
+    
     void set_transition (int current_speed_, int final_speed_, 
             int constant, motor_transition transition_)
     {

@@ -63,81 +63,29 @@ struct flashled_data
     int  NS;
 };
 
-/* BOT 1 Challenge 1 -------- */
-flashled_data   c1b1_initflash          = {RED_LED_FLASH|BLUE_LED_FLASH, 3, 200, 800, 0,0, 5}; // state 1
+/* BOT 1 Challenge 1 ----------------------------- */
+flashled_data   c1b1_initflash          = {RED_LED_FLASH|BLUE_LED_FLASH, 3, 200, 800, 0,0, 69}; // state 1
 talk_data       c1b1_start_talk         = {500,  0  ,10}; // state 5
 flashled_data   c1b1_startflash         = {GREEN_LED_FLASH, 1, 1000, 0, 0, 0, 15}; // state 10
 move_data       c1b1_starting_run       = {100, 0, 100, 100, 0, 20}; // state 15
-move_data       c1b1_go_back_a_bit_bot1 = {100, 0, 100, 100, 0, 23}; // state 20
-move_data       c1b1_turn_a_bit_bot1    = {100, 0, 100, 100, 0, 25}; // state 23
+move_data       c1b1_go_back_a_bit_bot1 = {100, 1000, -100, -100, 0, 23}; // state 20
+move_data       c1b1_turn_a_bit_bot1    = {100, 300, 100, -100, 0, 25}; // state 23
 tracktrack_data c1b1_track_blue         = {BLACK, BLUE,  YELLOW, RIGHT_TRACK, 100,75, 25, 750, 30}; // state 25
-move_data       c1b1_turn_after_blue    = {100, 0, 100, 100, 0, 35}; // state 30
+move_data       c1b1_turn_after_blue    = {100, 400, 100, -100, 0, 35}; // state 30
 tracktrack_data c1b1_track_yellow       = {BLACK, YELLOW,  RED, RIGHT_TRACK, 100,75, 25, 750, 40}; // state 35
-move_data       c1b1_turn_after_yellow  = {100, 0, 100, 100, 0, 45}; // state 40 
+move_data       c1b1_turn_after_yellow  = {100, 400, -100, 100, 0, 45}; // state 40 
 tracktrack_data c1b1_track_red          = {BLACK, RED,  NONE, RIGHT_TRACK, 100,75, 25, 750, 50}; // state 45
-move_data       c1b1_turn_after_red     = {100, 0, 100, 100, 0,55}; // state 50 
+move_data       c1b1_turn_after_red     = {100, 400, -100, 100, 0,55}; // state 50 
  
+move_data testbot2 = {100,1000,100,-100,0,69};
  
- 
- 
- 
- 
- 
- 
- 
- 
- 
+tracktrack_data testtrack          = {YELLOW, RED,  BLACK, RIGHT_TRACK, 100,75, 25, 750, 50}; // state 45-
 
-
-
-
-/* -------------------   =  ramp_time| run_time | Lmotor_speed | Rmotor_speed | temporary |  NS */
-move_data turn_right_9069 = {100,       10000,     170,           -100,           0,           69};
-move_data turn_left_9069  = {100,       400,       -100,           170,           0,           69};
-move_data turn_right_905  = {100,       400,       170,           -100,           0,           5};
-move_data turn_left_903   = {100,       400,       -100,           170,           0,           3};
-
-move_data turn_right_90   = {100,       400,       170,           -100,           0,           69};
-
-
-
-
-flashled_data fdt1     = {RED_LED_FLASH|BLUE_LED_FLASH, 10, 200, 200, 0,0,69};
-flashled_data bluered3 = {RED_LED_FLASH|BLUE_LED_FLASH, 3, 500, 200,  0,0,69};
-flashled_data bluered3i = {RED_LED_FLASH|GREEN_LED_FLASH, 3, 500, 200,  0,0,-1};
-
-talk_data   send500_test   = {500,0,69};
-listen_data listen500_test = {500,75,false,0,69};
-
-tracktrack_data YELLOW_RED_TEST = {YELLOW,  RED,  BLACK, RIGHT_TRACK ,130,90, 25, 1000, 69};
-
-// ALSO WORKS
-// tracktrack_data YELLOW_RED_TEST = {YELLOW,  RED,  BLACK, RIGHT_TRACK ,100,75, 25, 1000, 69};
-
-
-
-
-// track tracking
-// -----------------    =  LEFT    RIGHT  DEST   track_side   SPD TSPD  TDR   NS
-tracktrack_data lyrr_rt = {YELLOW, RED,   BLACK, RIGHT_TRACK ,150,100, -50, 750, 69};
-tracktrack_data lrry_lt = {RED, YELLOW,   BLACK, LEFT_TRACK  ,150,100, -50, 750, 69};
-
-tracktrack_data lbrr_rt = {BLACK, RED,   YELLOW, RIGHT_TRACK ,150,100, -50, 750, 69};
-tracktrack_data lrrb_lt = {RED, BLACK,   YELLOW, LEFT_TRACK  ,150,100, -50, 750, 69};
-
-/*
-tracktrack_data lbrr_rt2 = {YELLOW, RED,    BLACK, RIGHT_TRACK , 100, 0, 750, 69};
-tracktrack_data lbry_rt4 = {BLACK,  YELLOW, BLUE,   RIGHT_TRACK ,150, 30, 750, 4};
-tracktrack_data llrb_lt6 = {BLUE,   BLACK,  YELLOW, LEFT_TRACK  ,150, 30, 750, 6};
-*/
-
-tracktrack_data lbrr_rt2 = {BLACK, RED,    YELLOW, RIGHT_TRACK ,170, 150, 50, 750, 2};
-tracktrack_data lbry_rt4 = {BLACK, YELLOW, BLUE,   RIGHT_TRACK ,170, 150, 50, 750, 4};
-tracktrack_data llrb_lt6 = {BLUE,  BLACK,  YELLOW, LEFT_TRACK  ,170, 150, 50, 750, 6};
-
-
-
-
+int none (bool first_run, void *v)
+{
+  (void) first_run; (void) v;
+  return 0;  
+}
 
 
 /* DO_NOTHING ---------------------------------------------------------------------- */
@@ -157,6 +105,7 @@ int hardware_stop (bool first_run, void *v)
 int tracktrack (bool firstrun, void *v) 
 {
 
+  DBG;
   tracktrack_data *ttd = (tracktrack_data*)v;
   if (firstrun) {
       //Serial.println("SET_ME_ON_FIRE");
@@ -168,7 +117,11 @@ int tracktrack (bool firstrun, void *v)
   
   // TODO: MAKE VARIABLE
   // IF EITHER MOTOR IS ON THE DESIRED COLOR, THEN TRANSITION
-  if (ttd->D == Bot.sensors.right() || ttd->D == Bot.sensors.left()) {
+  if (ttd->D == NONE && Bot.collision_interrupt) {
+      Bot.collision_interrupt = 0;                            // IF SOMETHING IS GOING WRONG THEN 
+      Bot.collision_interrupt_last = 0;                       // IT WILL BE WITH THIS !!!!!!!!!!!!!!!!!!!!!
+      return ttd -> NS;
+  } else if (ttd->D == Bot.sensors.right() || ttd->D == Bot.sensors.left()) {
       Bot.show_following_path(NONE);
       return ttd->NS;
   }
@@ -224,6 +177,7 @@ int tracktrack (bool firstrun, void *v)
 /* MOVEBOT ---------------------------------------------------------------------- */
 int move_time (bool firstrun, void *v) 
 {
+  DBG;
   move_data *md = (move_data*)v;
 
 
@@ -248,6 +202,7 @@ int move_time (bool firstrun, void *v)
 
 int move_collision (bool firstrun, void *v) 
 {
+  DBG;
   move_data *md = (move_data*)v;
 
 

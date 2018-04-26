@@ -79,7 +79,7 @@ public:
     template <int N> 
     void run_ (state_initializer (&si)[N],int routine) 
     {
-       
+        
         this-> routine = routine;
         bot_state_machine.setup(si,routine);
 
@@ -89,9 +89,10 @@ public:
         while (!bot_state_machine.complete()) {
             check_interrupts();
             if (hardware_on) {
+                 
                 poll_sensors();
             } else {
-                //Serial.println("HARDWARE OFF");
+                Serial.println("HARDWARE OFF");
                 digitalWrite(mpinE,LOW);
                 rmotor.off();
                 lmotor.off(); 

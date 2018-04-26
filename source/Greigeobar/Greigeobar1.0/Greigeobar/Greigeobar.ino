@@ -115,6 +115,12 @@ void setup ()
     pinMode( PIN1_M2 , OUTPUT); // ?
     pinMode( PIN2_M2 , OUTPUT); // ?
 
+    // ENSURE MOTORS OFF
+    analogWrite(PIN1_M1,0);
+    analogWrite(PIN2_M1,0);
+    analogWrite(PIN1_M2,0);
+    analogWrite(PIN2_M2,0);
+
     attachInterrupt(digitalPinToInterrupt(HALL),      hall_detect,      FALLING);
     attachInterrupt(digitalPinToInterrupt(COLLISION), collision_detect, FALLING);
     interrupts();
@@ -124,7 +130,8 @@ void setup ()
 
 void loop ()
 {
-
+    Bot.lmotor.debug(); 
+    Bot.rmotor.debug();
 
     digitalWrite (L_TURNSIGNAL,LOW);
     digitalWrite (BREAKLIGHTS,HIGH);
