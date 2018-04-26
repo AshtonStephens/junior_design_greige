@@ -9,6 +9,9 @@
 #define GREEN_LED_FLASH  1 << 1
 #define BLUE_LED_FLASH   1 << 2
 
+void nothing();
+void hall_detect();
+void collision_detect();
 
 struct talk_data 
 {
@@ -61,18 +64,18 @@ struct flashled_data
 };
 
 /* BOT 1 Challenge 1 -------- */
-flashled_data   c1b1_startflash         = {RED_LED_FLASH|BLUE_LED_FLASH, 3, 200, 800, 0,0, 5}; // state 1
-talk_data       c1b1_start_talk         = {500,  0  ,10} // state 5
-flashled_data   c1b1_bot1_startflash    = {GREEN_LED_FLASH, 1, 1000, 0, 0, 0, 15}; // state 10
-move_data       c1b1_starting_run       = {100, 0, 100, 100, 0, 0, 20}; // state 15
-move_data       c1b1_go_back_a_bit_bot1 = {100, 0, 100, 100, 0, 0, 23}; // state 20
-move_data       c1b1_turn_a_bit_bot1    = {100, 0, 100, 100, 0, 0, 25}; // state 23
+flashled_data   c1b1_initflash          = {RED_LED_FLASH|BLUE_LED_FLASH, 3, 200, 800, 0,0, 5}; // state 1
+talk_data       c1b1_start_talk         = {500,  0  ,10}; // state 5
+flashled_data   c1b1_startflash         = {GREEN_LED_FLASH, 1, 1000, 0, 0, 0, 15}; // state 10
+move_data       c1b1_starting_run       = {100, 0, 100, 100, 0, 20}; // state 15
+move_data       c1b1_go_back_a_bit_bot1 = {100, 0, 100, 100, 0, 23}; // state 20
+move_data       c1b1_turn_a_bit_bot1    = {100, 0, 100, 100, 0, 25}; // state 23
 tracktrack_data c1b1_track_blue         = {BLACK, BLUE,  YELLOW, RIGHT_TRACK, 100,75, 25, 750, 30}; // state 25
-move_data       c1b1_turn_after_blue    = {100, 0, 100, 100, 0, 0, 35}; // state 30
+move_data       c1b1_turn_after_blue    = {100, 0, 100, 100, 0, 35}; // state 30
 tracktrack_data c1b1_track_yellow       = {BLACK, YELLOW,  RED, RIGHT_TRACK, 100,75, 25, 750, 40}; // state 35
-move_data       c1b1_turn_after_yellow  = {100, 0, 100, 100, 0, 0, 45}; // state 40 
-tracktrack_data c1b1_track_red          = {BLACK, RED,  NONE, RIGHT_TRACK, 100,75, 25, 750, 40}; // state 35
-move_data       c1b1_turn_after_red     = {100, 0, 100, 100, 0, 0, 45}; // state 40 
+move_data       c1b1_turn_after_yellow  = {100, 0, 100, 100, 0, 45}; // state 40 
+tracktrack_data c1b1_track_red          = {BLACK, RED,  NONE, RIGHT_TRACK, 100,75, 25, 750, 50}; // state 45
+move_data       c1b1_turn_after_red     = {100, 0, 100, 100, 0,55}; // state 50 
  
  
  
@@ -84,7 +87,7 @@ move_data       c1b1_turn_after_red     = {100, 0, 100, 100, 0, 0, 45}; // state
  
  
  
- = {GREEN_LED_FLASH, 1, 1000, 0, 0, 0, 15}; // state 10
+
 
 
 
@@ -267,7 +270,7 @@ int move_collision (bool firstrun, void *v)
 }
 
 /* FLASHLEDS ---------------------------------------------------------------------- */
-int flashleds (bool firstrun, void *v) 
+int flashled (bool firstrun, void *v) 
 {
     flashled_data *fd = (flashled_data*)v;
     if (firstrun) {
