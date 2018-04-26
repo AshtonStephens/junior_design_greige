@@ -15,6 +15,15 @@
 #define THREAD_6 1 << 6
 #define THREAD_7 1 << 7
 
+#define THREAD_8  1 << 8
+#define THREAD_9  1 << 9
+#define THREAD_10 1 << 10
+#define THREAD_11 1 << 11
+#define THREAD_12 1 << 12
+#define THREAD_13 1 << 13
+#define THREAD_14 1 << 14
+#define THREAD_15 1 << 15
+
 int line_tracking (void *n)
 {
     (void) n;
@@ -40,6 +49,9 @@ struct state
     state (int (*f)(bool,void*)) : action(f), data(NULL) {};
     state (int (*f)(bool,void*), void*v) : action(f), data(v) {};
 
+    bool operator == (const state &s) const 
+    {return data == s.data && action == s.action;} 
+
     // stored data
     int (*action)(bool,void*);
     void *data;
@@ -64,15 +76,17 @@ void initialize_thread
     for (int i = 0; i < THREAD_SIZE; ++i) thread[i] = {default_state};
 
     for (int i = 0; i < N; ++i) {
-        if (!(si[i].threads & mask)) break; // leave if this thread not apply
-
-        if (si[i].id > THREAD_SIZE) {
+         
+        if (!(si[i].threads & mask)) {
+            // leave if this thread not apply
+        } else if (si[i].id > THREAD_SIZE) {
             Serial.println("FATAL INIT ERROR - STATE ID OUT OF BOUNDS");
         } else if (si[i].id <= 0) {
             Serial.println("FATAL INIT ERROR - STATE ID 0 OR LOWER IS INVALID");
         } else {
             thread[si[i].id] = si[i].s;
         }
+        
         
     }
 }

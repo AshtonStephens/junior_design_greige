@@ -5,20 +5,23 @@
 #ifndef STATE_MACHINE_H
 #define STATE_MACHINE_H
 
+#include "DEBUGME.h"
 #include "smart_bot.h"
 #include "states.h"
+
+#define HALL_INTERRUPT      70
+#define COLLISION_INTERRUPT 71
 
 #define STATE_STACK_SIZE  5
 class state_machine 
 {
-
 private:
     int     stack_id;
     state   stack  [STATE_STACK_SIZE];
     state   thread [THREAD_SIZE];
-    bool    state_change;
+    state   last;
 public:
-    state_machine () : stack_id() {}
+    state_machine () : stack_id(0) {} // TODO!!!
     
     template <int N>
     void setup   (state_initializer (&si)[N], int routine)  
@@ -26,6 +29,7 @@ public:
       stack_id = 0;
       initialize_thread(si,routine,thread);
       stack[stack_id] = thread[1];
+      last = thread[0];
     }
 
     bool complete () // TODO: MAKE THIS ACTUALLY DO SOMETHING
@@ -33,10 +37,9 @@ public:
 
     void execute ()
     {   
-        int move_ = stack[stack_id].action(state_change,stack[stack_id].data);
-        state_change = false;
+        int move_ = stack[stack_id].action(!(last == stack[stack_id]),stack[stack_id].data);
+        last = stack[stack_id];
         if (move_) {
-            state_change = true;
             // if the output was not 0
             if (move_ < 0) {
                 stack_pop();
@@ -52,7 +55,10 @@ public:
     
     void stack_pop () {
         if (stack_id == 0) {
-            //Serial.println("RUNTIME ERROR - TRYING TO REMOVE LAST STACK STATE"); 
+            Serial.println("RUNTIME ERROR - TRYING TO REMOVE LAST STACK STATE"); 
+        } else {
+           stack[stack_id] = stack[stack_id-1];
+           --stack_id;
         }
     }
 

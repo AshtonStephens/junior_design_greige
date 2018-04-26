@@ -8,8 +8,8 @@
  */
  
 #define CALIBRATION_PIN 21
-#define BLUE_LED_PIN 28
-#define  RED_LED_PIN 29
+#define BLUE_LED_PIN 37
+#define  RED_LED_PIN 39
 
 #define   SENSOR_PIN A7
 

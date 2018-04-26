@@ -50,12 +50,33 @@ public:
         motor_go(0);
     } 
 
+    int speed_ () {
+        return current_speed; 
+    }
+
+    void off ()
+    {
+        this->set_transition (CURRENT_SPEED, 0, 1000, LINEAR_SLOPE);
+    }
+
     // returns true if the motor has achieved the final speed
     bool at_final_speed () 
-    {return final_speed == current_speed;}
+    {
+        return (final_speed == current_speed);
+    }
     
     void maintain ()
     {
+        /*
+        Serial.println(__func__);
+        Serial.print("current_speed: ");
+        Serial.println(current_speed);
+        Serial.print("final_speed: ");
+        Serial.println(final_speed);
+        Serial.print("coeff: ");
+        Serial.println(coeff);
+        Serial.println(); */
+        
         int ds;
         int new_speed;
         long long current_update;
@@ -102,7 +123,13 @@ public:
             case LINEAR_SLOPE: 
             // turns coeff into slope s.t. the input constant defines
             // the change in motor value per second
-            (*this).coeff  = ((float)constant) / 1000; 
+            (*this).coeff  = ((float)constant) / 1000;
+
+            // make the slope the right sign
+            if ( ((this-> coeff) < 0 && (final_speed_ - current_speed_) > 0 )||
+                 ((this-> coeff) > 0 && (final_speed_ - current_speed_) < 0 ))
+                 this->coeff = -this-> coeff; 
+            
             break;
 
             case LINEAR_DURATION:

@@ -16,7 +16,7 @@
 
 // MAKE MORE PROMINENT
 typedef float Betas[NPARAMS+1];
-#define DEBUG_CSENSOR
+// #define DEBUG_CSENSOR
 
 class csensor 
 {
@@ -45,7 +45,7 @@ class csensor
     const Betas &bluB_right;
 
     public:
-    
+
     csensor(int sensor_pin_left, int sensor_pin_right,int red_pin, int blue_pin,
             int stabilization_time, 
             const Betas &redB_left , const Betas &bluB_left,
@@ -81,6 +81,12 @@ class csensor
     color left() {
         return color_left;  
     }
+
+    void off ()
+    {
+        digitalWrite(blue_pin, LOW); 
+        digitalWrite(red_pin , LOW); 
+    }
     
     private:
     
@@ -91,23 +97,23 @@ class csensor
         switch (led_color_state++) {
             case 0:
                 // BOTH off
-                analogWrite(blue_pin, 0); 
-                analogWrite(red_pin , 0); 
+                digitalWrite(blue_pin, LOW); 
+                digitalWrite(red_pin , LOW); 
                 break;
             case 1:
                 // blue on
-                analogWrite(blue_pin, 255); 
-                analogWrite(red_pin,  0); 
+                digitalWrite(blue_pin, HIGH); 
+                digitalWrite(red_pin,  LOW); 
                 break;
             case 2:
                 // BOTH on
-                analogWrite(blue_pin, 255); 
-                analogWrite(red_pin,  255); 
+                digitalWrite(blue_pin, HIGH); 
+                digitalWrite(red_pin,  HIGH); 
                 break;
             case 3:
                 // red on
-                analogWrite(blue_pin, 0); 
-                analogWrite(red_pin,  255); 
+                digitalWrite(blue_pin, LOW); 
+                digitalWrite(red_pin,  HIGH); 
                 led_color_state = 0;
                 break;
             default:
@@ -132,18 +138,21 @@ class csensor
     void decide_colors  ()
     {
         // ----------------------------- TEMPORARY DEBUG CODE -----------------
+
+        
         color_left  = predict_full(readings_left ,redB_left ,bluB_left ); 
         color_right = predict_full(readings_right,redB_right,bluB_right); 
+        
 
         #ifdef DEBUG_CSENSOR 
         
-        /* -------------------------------------------------------------------------------------
+        /* --------------------------------------------------------- */
         Serial.print("[");
         print_color(color_left);
         Serial.print("][");
         print_color(color_right);
         Serial.println("]");
-        */
+        
         
         #endif
     }

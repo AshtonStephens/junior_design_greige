@@ -14,7 +14,7 @@
 #include "color.h"
 #include "regression2.h"
 
-#define PRINTME false
+#define PRINTME true
 
 class csensor 
 {

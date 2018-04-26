@@ -26,15 +26,15 @@
 #define L_LIGHT_SENSOR  A6 // ?
 #define R_LIGHT_SENSOR  A7 // ?
 #define HALL_EFFECT     3  
-#define RED_SENSOR_LED  29 
-#define BLUE_SENSOR_LED 28 
+#define RED_SENSOR_LED  39 
+#define BLUE_SENSOR_LED 37 
 #define COLLISION_PIN   2
 
 // communicaton ---- // 
 #define RECEIVING A7 //
 #define SENDING   27 //
 
-// motors ------------ // 
+// motors -------------- // 
 #define R_MOTOR_PIN2 7  // ?
 #define R_MOTOR_PIN1 6  // ?
 #define L_MOTOR_PIN2 5  // ?
@@ -44,10 +44,10 @@
 
 #include "bot.h"
 
-const float redBsl[NPARAMS+1] ={-1.903868, 3.080066, 1.502316, -0.705124, 0.515389};
-const float bluBsl[NPARAMS+1] ={-2.091942, -0.156429, -0.035497, 3.392170, 0.478369};
-const float redBsr[NPARAMS+1] = {-1.840674, 3.160087, 1.472051, -0.787523, 0.539282};
-const float bluBsr[NPARAMS+1] = {-2.182819, -0.093342, 0.034828, 3.400515, 0.624078};
+const float redBsl[NPARAMS+1] = {-5.713125, 15.103408, 6.903004, -5.565095, -1.073656};
+const float bluBsl[NPARAMS+1] = {-6.896294, -1.757802, -0.295036, 11.303079, 3.536464};
+const float redBsr[NPARAMS+1] =  {-5.627664, 15.468755, 6.993172, -5.601236, -1.420434};
+const float bluBsr[NPARAMS+1] = {-6.935288, -1.787222, -0.303681, 11.240418, 3.810915};
 
 bot BOTTY(R_MOTOR_PIN1, R_MOTOR_PIN2,
           L_MOTOR_PIN1, L_MOTOR_PIN2,
@@ -94,13 +94,13 @@ void loop()
     unsigned long timer;
     color r_color = BOTTY.sensors.right();
 
-    bool run = true;
+    bool run = false;
  
     
     int spd = 50; 
 
     
-/*
+
     if (run) {
       analogWrite (R_MOTOR_PIN1, 0);
       analogWrite (R_MOTOR_PIN2, 50);
@@ -112,8 +112,6 @@ void loop()
       analogWrite (L_MOTOR_PIN1, 0);
       analogWrite (L_MOTOR_PIN2, 0);
     }
-*/
-    //Serial.print(__LINE__);
 
       
 
