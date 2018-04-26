@@ -60,7 +60,31 @@ struct flashled_data
     int  NS;
 };
 
-
+/* BOT 1 Challenge 1 -------- */
+flashled_data   c1b1_startflash         = {RED_LED_FLASH|BLUE_LED_FLASH, 3, 200, 800, 0,0, 5}; // state 1
+talk_data       c1b1_start_talk         = {500,  0  ,10} // state 5
+flashled_data   c1b1_bot1_startflash    = {GREEN_LED_FLASH, 1, 1000, 0, 0, 0, 15}; // state 10
+move_data       c1b1_starting_run       = {100, 0, 100, 100, 0, 0, 20}; // state 15
+move_data       c1b1_go_back_a_bit_bot1 = {100, 0, 100, 100, 0, 0, 23}; // state 20
+move_data       c1b1_turn_a_bit_bot1    = {100, 0, 100, 100, 0, 0, 25}; // state 23
+tracktrack_data c1b1_track_blue         = {BLACK, BLUE,  YELLOW, RIGHT_TRACK, 100,75, 25, 750, 30}; // state 25
+move_data       c1b1_turn_after_blue    = {100, 0, 100, 100, 0, 0, 35}; // state 30
+tracktrack_data c1b1_track_yellow       = {BLACK, YELLOW,  RED, RIGHT_TRACK, 100,75, 25, 750, 40}; // state 35
+move_data       c1b1_turn_after_yellow  = {100, 0, 100, 100, 0, 0, 45}; // state 40 
+tracktrack_data c1b1_track_red          = {BLACK, RED,  NONE, RIGHT_TRACK, 100,75, 25, 750, 40}; // state 35
+move_data       c1b1_turn_after_red     = {100, 0, 100, 100, 0, 0, 45}; // state 40 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ = {GREEN_LED_FLASH, 1, 1000, 0, 0, 0, 15}; // state 10
 
 
 
@@ -195,7 +219,7 @@ int tracktrack (bool firstrun, void *v)
 }
 
 /* MOVEBOT ---------------------------------------------------------------------- */
-int movemedaddy (bool firstrun, void *v) 
+int move_time (bool firstrun, void *v) 
 {
   move_data *md = (move_data*)v;
 
@@ -215,6 +239,29 @@ int movemedaddy (bool firstrun, void *v)
   
   if (md->run_time < (millis() - md->start_time)) {
       DBG;
+      return md -> NS;
+  }
+}
+
+int move_collision (bool firstrun, void *v) 
+{
+  move_data *md = (move_data*)v;
+
+
+  // TURN ON LEFT TURN SIGNAL IF RIGHT MOTOR IS GOING FASTER THAN THE LEFT
+  // TURN ON RIGHT TURN SIGNAL IF LEFT MOTOR IS GOING FASTER THAN THE RIGHT
+  // TURN ON BREAK LIGHTS IF BOTH ARE SLOWING DOWN AND NOT TURNING
+  
+  if (firstrun) {
+
+      Bot.lmotor.set_transition(CURRENT_SPEED, md->Lmotor_speed, md->ramp_time, LINEAR_DURATION);
+      Bot.rmotor.set_transition(CURRENT_SPEED, md->Rmotor_speed, md->ramp_time, LINEAR_DURATION);
+      return 0;
+  }
+  
+  if (Bot.collision_interrupt) {
+      Bot.collision_interrupt = 0;
+      Bot.collision_interrupt_last = 0;
       return md -> NS;
   }
 }
@@ -259,6 +306,9 @@ int talk (bool firstrun, void *v)
 {
     talk_data *td = (talk_data *)v;
     
+    attachInterrupt(digitalPinToInterrupt(HALL), nothing, FALLING);      //
+    attachInterrupt(digitalPinToInterrupt(COLLISION), nothing, FALLING); //
+    
     if (firstrun) {
         Bot.sending_on();
         td -> start_time = millis();   
@@ -269,6 +319,8 @@ int talk (bool firstrun, void *v)
         return  0;
     } else {
         Bot.sending_off();
+        attachInterrupt(digitalPinToInterrupt(HALL), hall_detect, FALLING);           //
+        attachInterrupt(digitalPinToInterrupt(COLLISION), collision_detect, FALLING); //
         return td-> NS; 
     }
 }
