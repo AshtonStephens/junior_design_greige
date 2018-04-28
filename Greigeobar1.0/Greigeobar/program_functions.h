@@ -31,6 +31,14 @@ bool blueblack ()
   return (Bot.sensors.left() == BLUE) && (Bot.sensors.right() == BLACK);
 }
 
+static const int light_threshold = 200;
+
+bool headlights_sensed()
+{
+	return analogRead(HEADLIGHT_SENSOR) > light_threshold); 
+}
+
+
 void nothing();
 void hall_detect();
 void collision_detect();
@@ -425,5 +433,56 @@ int listen_ (bool firstrun, void *v)
         }
     }
 }
+
+/* BOT 1 Challenge 2 ----------------------------- */
+static const int FWD_TRAVEL_SPD = 200;
+static const int INCH_TRAVEL 	= 150;
+static const int TURN_WHEEL_SPD 	= -100;
+static const int OPP_WHEEL_SPD 		= 100;
+static const int TURN_90 		= 300;
+
+listen_data 	c2b1_rcv_500ms			= {515, 30, 1, 0, 5};
+move_data       c2b1_fwd_12in           = {100, INCH_TRAVEL*12, FWD_TRAVEL_SPD, FWD_TRAVEL_SPD,   0, 10};
+move_data       c2b1_stop_1      		= {100, 1000,	0,	 0,	  0, 15};
+move_data       c2b1_turn_180      		= {100, TURN_90*2, TURN_WHEEL_SPD, OPP_WHEEL_SPD, 0, 20};
+move_data       c2b1_back_3     		= {100, INCH_TRAVEL*3, -FWD_TRAVEL_SPD, -FWD_TRAVEL_SPD,   0, 25};
+move_data       c2b1_stop_2      		= {100, 1000,	0,	 0,	  0, 30};
+move_data       c2b1_left_90      		= {100, TURN_90, TURN_WHEEL_SPD, OPP_WHEEL_SPD, 0, 35};
+move_data       c2b1_right_1      		= {100, TURN_90, OPP_WHEEL_SPD, TURN_WHEEL_SPD, 0, 40};
+move_data       c2b1_lightstop_1      	= {100, 500,	0,	 0,	  0, 45}; 
+move_data       c2b1_right_2      		= {100, TURN_90, OPP_WHEEL_SPD, TURN_WHEEL_SPD, 50};
+move_data       c2b1_lightstop_2      	= {100, 500,	0,	 0,	  0, 55};
+move_data       c2b1_right_3      		= {100, TURN_90, OPP_WHEEL_SPD, TURN_WHEEL_SPD, 60};
+move_data		c2b1_back_to_start		= {100, INCH_TRAVEL*15, -FWD_TRAVEL_SPD, -FWD_TRAVEL_SPD,   0, 65};
+talk_data		c2b1_send_500ms			= {500, 0, 69};
+
+/* BOT 2 Challenge 2 ----------------------------- */
+talk_data		c2b2_send_500ms			= {500, 0, 2};
+listen_data 	c2b2_rcv_500ms			= {515, 30, 1, 0, 5};
+move_data       c2b2_fwd_12in           = {100, INCH_TRAVEL*12, FWD_TRAVEL_SPD, FWD_TRAVEL_SPD,   0, 10};
+move_data       c2b2_stop_1      		= {100, 1000,	0,	 0,	  0, 15};
+move_data       c2b2_turn_180      		= {100, TURN_90*2, TURN_WHEEL_SPD, OPP_WHEEL_SPD, 0, 20};
+move_data       c2b2_back_3     		= {100, INCH_TRAVEL*3, -FWD_TRAVEL_SPD, -FWD_TRAVEL_SPD,   0, 25};
+move_data       c2b2_stop_2      		= {100, 1000,	0,	 0,	  0, 30};
+move_data       c2b2_left_90      		= {100, TURN_90, TURN_WHEEL_SPD, OPP_WHEEL_SPD, 0, 35};
+move_data       c2b2_right_1      		= {100, TURN_90, OPP_WHEEL_SPD, TURN_WHEEL_SPD, 0, 40};
+move_data       c2b2_lightstop_1      	= {100, 500,	0,	 0,	  0, 45}; 
+move_data       c2b2_right_2      		= {100, TURN_90, OPP_WHEEL_SPD, TURN_WHEEL_SPD, 50};
+move_data       c2b2_lightstop_2      	= {100, 500,	0,	 0,	  0, 55};
+move_data       c2b2_right_3      		= {100, TURN_90, OPP_WHEEL_SPD, TURN_WHEEL_SPD, 60};
+move_data		c2b2_back_to_start		= {100, INCH_TRAVEL*15, -FWD_TRAVEL_SPD, -FWD_TRAVEL_SPD,   0, 69};
+
+/* BOT 1 Challenge 3 -------------------------------- */
+move_data_if 	c3b1_forward_light		= {100, headlights_sensed, FWD_TRAVEL_SPD, FWD_TRAVEL_SPD, 5);
+move_data       c3b1_stop_5s      		= {100, 5000,	0,	 0,	  0, 10};
+talk_data		c3b1_send_500ms			= {500, 0, 15};
+flashled_data 	c3b1_flash_head_twice	= {};	
+flashed_data 	c3b1_illuminate_turn	= {};
+
+/* BOT 1 Challenge 2 -------------------------------- */
+move_data_if 	c3b2_forward_light		= {100, headlights_sensed, FWD_TRAVEL_SPD, FWD_TRAVEL_SPD, 5);
+listen_data		c3b2_rcv_500ms			= {515, 30, 1, 0, 10};
+flashled_data 	c3b2_flash_head_twice	= {};	
+flashed_data 	c3b2_illuminate_turn	= {};
 
 #endif
