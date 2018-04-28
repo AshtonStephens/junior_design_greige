@@ -112,7 +112,6 @@ public:
         
         if (collision_interrupt_last != collision_interrupt) {
             collision_interrupt_last = collision_interrupt;
-            DBG_STP;
             handle_collision_interrupt();
         }
     }

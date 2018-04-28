@@ -48,12 +48,18 @@
 #define HALL_DEBOUNCE       250 // DEBOUNCE TIME 
 #define COLLISION_DEBOUNCE  250 // FOR INTERRUPT SENSORS
 
-#define STABILIZATION_TIME 50
+#define STABILIZATION_TIME 20
+/*    ZINNOBAR
+const float redBsl[NPARAMS+1] = {-6.101946, -14.323162, 23.169413};
+const float bluBsl[NPARAMS+1] = {-14.618992, 19.059864, -1.598202};
+const float redBsr[NPARAMS+1] = {-3.953188, -16.098141, 23.316850};
+const float bluBsr[NPARAMS+1] = {-12.612396, 13.973304, 2.472246};
+*/ 
 
-const float redBsl[NPARAMS+1] = {-5.713125, 15.103408, 6.903004, -5.565095, -1.073656};
-const float bluBsl[NPARAMS+1] = {-6.896294, -1.757802, -0.295036, 11.303079, 3.536464};
-const float redBsr[NPARAMS+1] =  {-5.627664, 15.468755, 6.993172, -5.601236, -1.420434};
-const float bluBsr[NPARAMS+1] = {-6.935288, -1.787222, -0.303681, 11.240418, 3.810915};
+const float redBsr[NPARAMS+1] = {-6.388153, -12.839205, 22.176529};
+const float bluBsr[NPARAMS+1] = {-13.134911, 19.116380, -2.625003};
+const float redBsl[NPARAMS+1] = {-5.140660, -14.058928, 22.504624};
+const float bluBsl[NPARAMS+1] = {-12.176397, 16.411099, -0.047437};
 
 smart_bot Bot ( LED_YELLOW_TRACK, LED_BLUE_TRACK, LED_RED_TRACK,
                 LED_STATE_GREEN, LED_STATE_BLUE, LED_STATE_RED,
@@ -136,14 +142,14 @@ void setup ()
 
 void loop ()
 {
-    Serial.println(__FILE__);
-    Bot.lmotor.debug(); 
-    Bot.rmotor.debug();
+    //Serial.println(__FILE__);
+    //Bot.lmotor.debug(); 
+    //Bot.rmotor.debug();
 
     digitalWrite (L_TURNSIGNAL,LOW);
     digitalWrite (BREAKLIGHTS,HIGH);
    
-    digitalWrite (PINE_M,HIGH);
+    //digitalWrite (PINE_M,HIGH);
     
     // ----------------------------------
     long long timer = millis ();

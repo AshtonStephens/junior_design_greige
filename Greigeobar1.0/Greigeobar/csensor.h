@@ -97,12 +97,13 @@ class csensor
             case 0:
                 // BOTH off
                 digitalWrite(blue_pin, LOW); 
-                digitalWrite(red_pin , LOW); 
+                digitalWrite(red_pin , HIGH); 
                 break;
             case 1:
                 // blue on
                 digitalWrite(blue_pin, HIGH); 
-                digitalWrite(red_pin,  LOW); 
+                digitalWrite(red_pin,  LOW);
+                led_color_state = 0;
                 break;
             case 2:
                 // BOTH on
@@ -122,7 +123,7 @@ class csensor
     
     void reset_readings ()
     {
-        for (int i = 0; i < 4; ++i) {
+        for (int i = 0; i < NPARAMS; ++i) {
             readings_left [i] = 0;
             readings_right[i] = 0;
         }
@@ -144,14 +145,17 @@ class csensor
         
 
         #ifdef DEBUG_CSENSOR 
-        
+        /*
+        print_readings(readings_left,readings_right);
+        */
         /* --------------------------------------------------------- */
+           
         Serial.print("[");
         print_color(color_left);
         Serial.print("][");
         print_color(color_right);
         Serial.println("]");
-        
+         
         
         #endif
     }
@@ -177,19 +181,18 @@ class csensor
         }
     }
 
-    void print_readings(float readings[NPARAMS]) 
+    void print_readings(float readingsl[NPARAMS],float readingsr[NPARAMS]) 
     {
         Serial.print("{csensor}:");
-        Serial.print("[ __: ");
-        Serial.print(readings[0]);
-        Serial.print(" | B_: ");
-        Serial.print(readings[1]);
-        Serial.print(" | BR: ");
-        Serial.print(readings[2]);
-        Serial.print(" | _R: ");
-        Serial.print(readings[3]);
-        Serial.print(" ]");
-        Serial.print("\n");
+        Serial.print("[ lB: ");
+        Serial.print(readingsl[0]);
+        Serial.print(" | lR: ");
+        Serial.print(readingsl[1]);
+        Serial.print(" | rB: ");
+        Serial.print(readingsr[0]);
+        Serial.print(" | rR: ");
+        Serial.print(readingsr[1]);
+        Serial.println(" ]");
     }
 
 };

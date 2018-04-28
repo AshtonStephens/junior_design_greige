@@ -86,7 +86,7 @@ struct tracktrack_data
   color L; // left color
   color R; // right color
   color D; // destination color
-  bool track_right;
+  int  last_state; // 
   int  ft; // fullthrottle
   int  mt; // mediumthrottle
   int  lt; // lowthrottle
@@ -96,20 +96,34 @@ struct tracktrack_data
 
 /* BOT 1 Challenge 1 ----------------------------- */
 
+
+
+
+
+
+
 flashled_data   c1b1_initflash          = {RED_LED_FLASH|BLUE_LED_FLASH, 3, 200, 800, 0,0, 69}; // state 1
 talk_data       c1b1_start_talk         = {500,  0  ,10}; // state 5
 flashled_data   c1b1_startflash         = {GREEN_LED_FLASH, 1, 1000, 0, 0, 0, 15}; // state 10
 
-move_data       c1b1_starting_run1      = {100, 2000, 200, 200,   0, 10}; // state 1 -> 10
-move_data       c1b1_starting_run2      = {100, 550, -150, -200,   0, 12}; // state 10-> 12 
-move_data       c1b1_starting_run3      = {100, 300, 100, -200,   0, 25}; // state 12 -> 69
-tracktrack_data c1b1_track_blue         = {BLUE, BLUE,  YELLOW, LEFT_TRACK, 70,50,0, 750, 30}; // state 25
+move_data       c1b1_starting_run1      = {100, 2000, 200, 200,  0, 10}; // state 1 -> 10
+move_data       c1b1_starting_run2      = {100, 550, -150, -200, 0, 12}; // state 10-> 12 
+move_data       c1b1_starting_run3      = {10000, 300, 100, -200,0, 69}; // state 12 -> 69
+
+
+
+tracktrack_data c1b1_track_red          = {RED, RED,    YELLOW, LEFT_TRACK, 50, 0,-50, 750, 15};  // state 10
+move_data       c1b1_right_90           = {100, 400, 150, -50, 0, 20};                           // state 15 -> 20 
+tracktrack_data c1b1_track_yellow       = {YELLOW, YELLOW, NONE, LEFT_TRACK, 150,0,-50, 750, 25}; // state 20 -> 25
+move_data       c1b1_left_90            = {100, 350, -100, 100, 0, 30};                           // state 25 -> 30 
+tracktrack_data c1b1_track_blue         = {BLUE, BLUE, NONE, LEFT_TRACK, 50,50,-50, 750, 69}; // state 30 -> 35
+ 
+
 //move_data       c1b1_turn_after_blue    = {100, 400, 200, -100, 0, 35}; // state 30 -> 35
 move_data_if    c1b1_turn_to_yellow     = {100, yellowblack, 140, -175, 35}; // -> 35
 
-tracktrack_data c1b1_track_yellow       = {YELLOW, BLACK,  NONE, LEFT_TRACK, 150, 170, 100, 750, 0}; // state 40
 move_data       c1b1_turn_after_yellow  = {100, 1000, -100, -100, 0, 45}; // state 40 
-tracktrack_data c1b1_track_red          = {BLACK, RED,  NONE, RIGHT_TRACK, 150,130, -50, 750, 50}; // state 45
+//tracktrack_data c1b1_track_red          = {BLACK, RED,  NONE, RIGHT_TRACK, 150,130, -50, 750, 50}; // state 45
 move_data       c1b1_turn_after_red     = {100, 400, -100, 100, 0,55}; // state 50 
  
 move_data testbot2 = {100,1000,100,-100,0,69};
@@ -154,6 +168,8 @@ int tracktrack (bool firstrun, void *v)
 
   //DBG;
   tracktrack_data *ttd = (tracktrack_data*)v;
+  int last_off = 0;
+  
   if (firstrun) {
       //Serial.println("SET_ME_ON_FIRE");
       // initially set motors to full throttle
@@ -177,47 +193,34 @@ int tracktrack (bool firstrun, void *v)
   
   // IF THE left IS ON THE TRACK COLOR +> MAKE SURE THE LEFT IS GOING SLOW 
   //                                   +> MAKE SURE THE RIGHT IS GOING FAST
-  if (ttd->track_right) {
-      Bot.show_following_path(ttd->R);
-      if (Bot.sensors.left() == ttd->L && Bot.sensors.right() == ttd->R) {
-          //Serial.println("go forward");
-          // IF IM CORRECTLY ON THE TRACK THEN GO FORWARD
-          Bot.lmotor.set_transition(CURRENT_SPEED, ttd->ft, ttd->slope, LINEAR_SLOPE);
-          Bot.rmotor.set_transition(CURRENT_SPEED, ttd->ft, ttd->slope, LINEAR_SLOPE);
-      } else if (Bot.sensors.left() == ttd->R) {
-          //Serial.println("adjust left");
-          // IF IM CORRECTLY ON THE TRACK THEN GO FORWARD
-          Bot.lmotor.set_transition(CURRENT_SPEED, ttd->lt, ttd->slope, LINEAR_SLOPE);
-          Bot.rmotor.set_transition(CURRENT_SPEED, ttd->mt, ttd->slope, LINEAR_SLOPE);
-      } else if (Bot.sensors.right() == ttd->L) {
-          //Serial.println("adjust right");
-          Bot.lmotor.set_transition(CURRENT_SPEED, ttd->mt, ttd->slope, LINEAR_SLOPE);
-          Bot.rmotor.set_transition(CURRENT_SPEED, ttd->lt, ttd->slope, LINEAR_SLOPE);
-      } else {
-         // Serial.println("wtf");
-          // TODO: IF I'M ON SOMETHING I DON'T UNDERSTAND THEN WTF
-      }
+   Bot.show_following_path(ttd->L);
+   if (Bot.sensors.left() == ttd->L && Bot.sensors.right() == ttd->R) { 
+      Serial.println("go forward");
+      ttd->last_state = 0;
+      // IF IM CORRECTLY ON THE TRACK THEN GO FORWARD
+      Bot.lmotor.set_transition(CURRENT_SPEED, ttd->ft, ttd->slope, LINEAR_SLOPE);
+      Bot.rmotor.set_transition(CURRENT_SPEED, ttd->ft, ttd->slope, LINEAR_SLOPE);
+  } else if ( (Bot.sensors.right() != ttd->R && Bot.sensors.left() == ttd->L) ||
+              ((Bot.sensors.right() != ttd->R  && Bot.sensors.left() != ttd->L) && (ttd->last_state == 1))) {
+      Serial.println("adjust left");
+      ttd->last_state = 1;
+      // ADJUST LEFT
+      Bot.rmotor.set_transition(CURRENT_SPEED, ttd->mt, ttd->slope, LINEAR_SLOPE);
+      Bot.lmotor.set_transition(CURRENT_SPEED, ttd->lt, ttd->slope, LINEAR_SLOPE);
+  } else if ( (Bot.sensors.left() != ttd->L && Bot.sensors.right() == ttd->R) || 
+              ((Bot.sensors.right() != ttd->R && Bot.sensors.left() != ttd->L) && (ttd->last_state == 2))) {
+      ttd->last_state = 2;
+      Serial.println("adjust right");
+      // ADJUST RIGHT
+      Bot.rmotor.set_transition(CURRENT_SPEED, ttd->lt, ttd->slope, LINEAR_SLOPE);
+      Bot.lmotor.set_transition(CURRENT_SPEED, ttd->mt, ttd->slope, LINEAR_SLOPE);
   } else {
-       Bot.show_following_path(ttd->L);
-       if (Bot.sensors.left() == ttd->L && Bot.sensors.right() == ttd->R) { 
-          //Serial.println("go forward");
-          // IF IM CORRECTLY ON THE TRACK THEN GO FORWARD
-          Bot.lmotor.set_transition(CURRENT_SPEED, ttd->ft, ttd->slope, LINEAR_SLOPE);
-          Bot.rmotor.set_transition(CURRENT_SPEED, ttd->ft, ttd->slope, LINEAR_SLOPE);
-      } else if (Bot.sensors.right() == ttd->L) {
-          //Serial.println("adjust right");
-          Bot.lmotor.set_transition(CURRENT_SPEED, ttd->mt, ttd->slope, LINEAR_SLOPE);
-          Bot.rmotor.set_transition(CURRENT_SPEED, ttd->lt, ttd->slope, LINEAR_SLOPE);
-      } else if (Bot.sensors.left() == ttd->R) {
-          //Serial.println("adjust left");
-          // IF IM CORRECTLY ON THE TRACK THEN GO FORWARD
-          Bot.lmotor.set_transition(CURRENT_SPEED, ttd->lt, ttd->slope, LINEAR_SLOPE);
-          Bot.rmotor.set_transition(CURRENT_SPEED, ttd->mt, ttd->slope, LINEAR_SLOPE);
-      } else {
-          //Serial.println("wtf");
-          // TODO: IF I'M ON SOMETHING I DON'T UNDERSTAND THEN WTF
-      }
+      Bot.lmotor.set_transition(CURRENT_SPEED, ttd->lt, ttd->slope, LINEAR_SLOPE);
+      Bot.rmotor.set_transition(CURRENT_SPEED, ttd->mt, ttd->slope, LINEAR_SLOPE);
+      Serial.println("wtf");
+      // TODO: IF I'M ON SOMETHING I DON'T UNDERSTAND THEN WTF
   }
+  
   return 0;
 }
 
@@ -262,7 +265,6 @@ int trackytrack (bool firstrun, void *v)
 /* MOVEBOT ---------------------------------------------------------------------- */
 int move_time (bool firstrun, void *v) 
 {
-  DBG;
   move_data *md = (move_data*)v;
 
 
@@ -287,7 +289,6 @@ int move_time (bool firstrun, void *v)
 
 int move_collision (bool firstrun, void *v) 
 {
-  DBG;
   move_data *md = (move_data*)v;
 
 

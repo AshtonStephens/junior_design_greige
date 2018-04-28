@@ -12,7 +12,7 @@
 #include "color.h"
 #include "math.h"
 
-#define NPARAMS 4
+#define NPARAMS 2
 
 float hypothesis (
                 const float X[NPARAMS], 
