@@ -73,7 +73,6 @@ public:
                     red_pin, blue_pin, stabilization_time,
                     redB_left,bluB_left,redB_right,bluB_right), 
                     hardware_on(true), hall_interrupt(0), collision_interrupt(0)
-                    
                     {pinMode (mpinE,OUTPUT);digitalWrite(mpinE,HIGH);}
        
     template <int N> 

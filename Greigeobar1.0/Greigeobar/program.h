@@ -48,6 +48,9 @@ tracktrack_data c1b1_track_blue         = {BLUE, BLUE, NONE, LEFT_TRACK, 50,50,-
     {THREAD_1, 20, {tracktrack, &c1b1_track_yellow}},
     {THREAD_1, 25,  {move_time, &c1b1_left_90}},
     {THREAD_1, 30, {tracktrack, &c1b1_track_blue}},
+
+    {THREAD_1, HALL_INTERRUPT, {tracktrack, &c1b1_run_person_over_part1}},
+    {THREAD_1, 90, {talk, &c1b1_run_person_over_part2}},
     
     
     /*
@@ -62,10 +65,8 @@ tracktrack_data c1b1_track_blue         = {BLUE, BLUE, NONE, LEFT_TRACK, 50,50,-
     {THREAD_1, 50, {tracktrack,&c1b1_turn_after_red}},
     {THREAD_1, 55, {hardware_stop, NULL}},              //// debug end
     */
-    {THREAD_8, 1, {move_if, &c1b1_turn_to_yellow}},
 
-    {THREAD_3, 1, {tracktrack, &testtrack}},
-    
+
     {THREAD_2, 1, {none, NULL}},
 
 

@@ -15,6 +15,7 @@
 #define IS_ADJUST_RIGHT 2
 #define IS_ADJUST_LEFT  3
 
+#define MR_ 2  // MOTOR RELATIONSHIP
 
 bool yellowblack () 
 { //Serial.print("adjusting");
@@ -49,7 +50,6 @@ struct listen_data
     long long start_time;
     int NS;
 };
-
 
 struct move_data
 {
@@ -91,16 +91,11 @@ struct tracktrack_data
   int  mt; // mediumthrottle
   int  lt; // lowthrottle
   int  slope; // duration of motor change
+  bool transblack;
   int  NS ; // next state
 };
 
 /* BOT 1 Challenge 1 ----------------------------- */
-
-
-
-
-
-
 
 flashled_data   c1b1_initflash          = {RED_LED_FLASH|BLUE_LED_FLASH, 3, 200, 800, 0,0, 69}; // state 1
 talk_data       c1b1_start_talk         = {500,  0  ,10}; // state 5
@@ -112,28 +107,43 @@ move_data       c1b1_starting_run3      = {10000, 300, 100, -200,0, 69}; // stat
 
 
 
-tracktrack_data c1b1_track_red          = {RED, RED,    YELLOW, LEFT_TRACK, 50, 0,-50, 750, 15};  // state 10
-move_data       c1b1_right_90           = {100, 400, 150, -50, 0, 20};                           // state 15 -> 20 
-tracktrack_data c1b1_track_yellow       = {YELLOW, YELLOW, NONE, LEFT_TRACK, 150,0,-50, 750, 25}; // state 20 -> 25
-move_data       c1b1_left_90            = {100, 350, -100, 100, 0, 30};                           // state 25 -> 30 
-tracktrack_data c1b1_track_blue         = {BLUE, BLUE, NONE, LEFT_TRACK, 50,50,-50, 750, 69}; // state 30 -> 35
+tracktrack_data c1b1_track_red          = {BLUE, BLUE,  YELLOW, LEFT_TRACK, MR_*50, MR_*0,MR_*-50, 750, false, 15};  // state 10
+move_data       c1b1_right_90           = {100, 340, MR_*150, MR_*-50, 0, 20};                           // state 15 -> 20 
+tracktrack_data c1b1_track_yellow       = {YELLOW, YELLOW, NONE, LEFT_TRACK, MR_*50,MR_*0,MR_*-50, 750, true, 25}; // state 20 -> 25
+move_data       c1b1_left_90            = {100, 350, MR_*-150, MR_*50, 0, 30};                           // state 25 -> 30 
+tracktrack_data c1b1_track_blue         = {RED, RED, NONE, LEFT_TRACK, MR_*50,MR_*0,MR_*-50, 750,false, 69}; // state 30 -> 35
+/*
+
+ABOVE IS SUPID
+
+
+tracktrack_data c1b1_track_red          = {RED, RED,    YELLOW, LEFT_TRACK, 50, 0,-50, 750, false, 15};  // state 10
+move_data       c1b1_right_90           = {100, 340, 150, -50, 0, 20};                           // state 15 -> 20 
+tracktrack_data c1b1_track_yellow       = {YELLOW, YELLOW, NONE, LEFT_TRACK, 50,0,-50, 750, true, 25}; // state 20 -> 25
+move_data       c1b1_left_90            = {100, 350, -50, 150, 0, 30};                           // state 25 -> 30 
+tracktrack_data c1b1_track_blue         = {BLUE, BLUE, NONE, LEFT_TRACK, 50,50,-50, 750,false, 69}; // state 30 -> 35
+
+
+
+
+ struct move_data
+{
+  int ramp_time;
+  int run_time;
+  int Lmotor_speed; 
+  int Rmotor_speed;
+  long long start_time;
+  int NS;
+};
  
 
-//move_data       c1b1_turn_after_blue    = {100, 400, 200, -100, 0, 35}; // state 30 -> 35
-move_data_if    c1b1_turn_to_yellow     = {100, yellowblack, 140, -175, 35}; // -> 35
+ */
 
-move_data       c1b1_turn_after_yellow  = {100, 1000, -100, -100, 0, 45}; // state 40 
-//tracktrack_data c1b1_track_red          = {BLACK, RED,  NONE, RIGHT_TRACK, 150,130, -50, 750, 50}; // state 45
-move_data       c1b1_turn_after_red     = {100, 400, -100, 100, 0,55}; // state 50 
+
  
-move_data testbot2 = {100,1000,100,-100,0,69};
-
-
-tracktrack_data testtrack = {YELLOW, BLACK, NONE, RIGHT_TRACK, 150,170, -50, 750, 2}; // state 45-
-move_data test_backward   = {100, 1000, -100, -100, 0, 69}; // state 40 
-
-
-
+// HALL EFFECT REACTION BOT_1
+move_data c1b1_run_person_over_part1 = {100,340,0,-150,0,90};
+talk_data c1b1_run_person_over_part2 = {200, 0, -1};
 
 
 int none (bool first_run, void *v)
@@ -159,6 +169,7 @@ int hardware_stop (bool first_run, void *v)
         Bot.rmotor.set_transition(CURRENT_SPEED,0, 100, LINEAR_SLOPE);
         Bot.hardware_on = false;
     }
+    Bot.hardware_on = false;
     return 0;
 } 
   
@@ -219,6 +230,10 @@ int tracktrack (bool firstrun, void *v)
       Bot.rmotor.set_transition(CURRENT_SPEED, ttd->mt, ttd->slope, LINEAR_SLOPE);
       Serial.println("wtf");
       // TODO: IF I'M ON SOMETHING I DON'T UNDERSTAND THEN WTF
+  }
+
+  if (ttd-> transblack && Bot.sensors.left() == BLACK && Bot.sensors.right() == BLACK) {
+      return ttd-> NS;
   }
   
   return 0;

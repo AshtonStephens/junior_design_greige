@@ -57,7 +57,6 @@ public:
         if (stack_id == 0) {
             Serial.println("RUNTIME ERROR - TRYING TO REMOVE LAST STACK STATE"); 
         } else {
-           stack[stack_id] = stack[stack_id-1];
            --stack_id;
         }
     }

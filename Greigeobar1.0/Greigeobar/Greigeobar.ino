@@ -49,17 +49,20 @@
 #define COLLISION_DEBOUNCE  250 // FOR INTERRUPT SENSORS
 
 #define STABILIZATION_TIME 20
-/*    ZINNOBAR
+
+// ZINNOBAR
 const float redBsl[NPARAMS+1] = {-6.101946, -14.323162, 23.169413};
 const float bluBsl[NPARAMS+1] = {-14.618992, 19.059864, -1.598202};
 const float redBsr[NPARAMS+1] = {-3.953188, -16.098141, 23.316850};
 const float bluBsr[NPARAMS+1] = {-12.612396, 13.973304, 2.472246};
-*/ 
 
+/*    
+// GREIGE
 const float redBsr[NPARAMS+1] = {-6.388153, -12.839205, 22.176529};
 const float bluBsr[NPARAMS+1] = {-13.134911, 19.116380, -2.625003};
 const float redBsl[NPARAMS+1] = {-5.140660, -14.058928, 22.504624};
 const float bluBsl[NPARAMS+1] = {-12.176397, 16.411099, -0.047437};
+*/ 
 
 smart_bot Bot ( LED_YELLOW_TRACK, LED_BLUE_TRACK, LED_RED_TRACK,
                 LED_STATE_GREEN, LED_STATE_BLUE, LED_STATE_RED,
