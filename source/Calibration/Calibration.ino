@@ -13,7 +13,7 @@
 
 #define   SENSOR_PIN A7
 
-#define STABILIZATION_TIME 50
+#define STABILIZATION_TIME 20
 
 #include "regression2.h"
 #include "csensor.h"
@@ -99,7 +99,6 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   //Serial.println("hello world");
-    
     while (true) {
       sensor.sense();
     }

@@ -21,6 +21,7 @@ void split (
     // Logically it made sense to break this up into red detect
     // versus blue detect
     for (int i = 0; i < NSEEDS; ++i) {
+      
         switch (Cd[i].col) {
             case BLUE:
                 Ys[(int)BLUE][i] = 1;
@@ -45,9 +46,7 @@ void split (
         }
         
         X[i][0] = 1;
-        X[i][1] = Cd[i].none/1023.0;
         X[i][2] = Cd[i].blue/1023.0;
-        X[i][3] = Cd[i].both/1023.0;
         X[i][4] = Cd[i].red/ 1023.0;
     }
 }

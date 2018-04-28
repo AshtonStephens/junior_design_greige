@@ -14,7 +14,7 @@
 #include "color.h"
 #include "regression2.h"
 
-#define PRINTME true
+#define PRINTME false
 
 class csensor 
 {
@@ -97,12 +97,13 @@ class csensor
             case 0:
                 // BOTH off [1]
                 digitalWrite(blue_pin, LOW); 
-                digitalWrite(red_pin , LOW); 
+                digitalWrite(red_pin , HIGH); 
                 break;
             case 1:
                 // blue on [2]
                 digitalWrite(blue_pin, HIGH); 
                 digitalWrite(red_pin,  LOW); 
+                led_color_state = 0;
                 break;
             case 2:
                 // BOTH on [3]
