@@ -13,6 +13,7 @@
 #define COLLISION_INTERRUPT 71
 
 #define STATE_STACK_SIZE  5
+
 class state_machine 
 {
 private:
@@ -62,13 +63,14 @@ public:
     }
 
     void stack_push(int id) {
-        if (stack_id == STATE_STACK_SIZE) {
+        if (stack_id+1 == STATE_STACK_SIZE) {
+            DBG_STP;
             // Serial.println("RUNTIME ERROR - TRYING TO ADD TOO MANY STATES TO STACK"); 
         } else {
             stack[++stack_id] = thread[id];
         }
     }
-        
+      
 };
 
 #endif

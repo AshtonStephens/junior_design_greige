@@ -11,7 +11,7 @@
 #define BLUE_LED_PIN 37
 #define  RED_LED_PIN 39
 
-#define   SENSOR_PIN A7
+#define   SENSOR_PIN A6
 
 #define STABILIZATION_TIME 20
 

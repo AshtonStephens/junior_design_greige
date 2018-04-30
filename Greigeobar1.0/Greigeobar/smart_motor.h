@@ -54,6 +54,8 @@ public:
         return current_speed; 
     }
 
+    bool decelerating () {return (coeff < 0) && (current_speed != final_speed);}
+
     void off ()
     {
         this->set_transition (CURRENT_SPEED, 0, 1000, LINEAR_SLOPE);

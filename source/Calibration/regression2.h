@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include "color.h"
 #define NPARAMS 4
-#define NSEEDS  16
+#define NSEEDS  32 
 
 
 struct calibration_data 

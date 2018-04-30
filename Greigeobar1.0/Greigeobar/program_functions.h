@@ -5,9 +5,20 @@
 #define RIGHT_TRACK true
 #define LEFT_TRACK  false
 
-#define RED_LED_FLASH    1 << 0
-#define GREEN_LED_FLASH  1 << 1
-#define BLUE_LED_FLASH   1 << 2
+#define RED_STATE_LED_FLASH    1 << 0
+#define GREEN_STATE_LED_FLASH  1 << 1
+#define BLUE_STATE_LED_FLASH   1 << 2
+
+#define BLUE_PATH_LED_FLASH    1 << 3
+#define RED_PATH_LED_FLASH     1 << 4
+#define YELLOW_PATH_LED_FLASH  1 << 5
+
+#define HEADLIGHT_LED_FLASH    1 << 6
+#define BREAKLIGHT_LED_FLASH   1 << 7
+#define LTURN_LED_FLASH        1 << 8
+#define RTURN_LED_FLASH        1 << 9
+
+#define TURNSIGNAL_THRESHOLD 50
 
 #define DEFAULT_END 69
 
@@ -15,7 +26,7 @@
 #define IS_ADJUST_RIGHT 2
 #define IS_ADJUST_LEFT  3
 
-#define MR_ 2  // MOTOR RELATIONSHIP
+#define MR_ 2 // MOTOR RELATIONSHIP
 
 bool yellowblack () 
 { //Serial.print("adjusting");
@@ -25,19 +36,70 @@ bool yellowblue ()
 { //Serial.print("adjusting");
   return (Bot.sensors.left() == YELLOW) && (Bot.sensors.right() == BLUE);
 }
-
 bool blueblack () 
 { //Serial.print("adjusting");
   return (Bot.sensors.left() == BLUE) && (Bot.sensors.right() == BLACK);
 }
+bool blueblue () 
+{ //Serial.print("adjusting");
+  return (Bot.sensors.left() == BLUE) && (Bot.sensors.right() == BLUE);
+}
+bool blueoblue () 
+{ //Serial.print("adjusting");
+  return (Bot.sensors.left() == BLUE) || (Bot.sensors.right() == BLUE);
+}
+bool yellowyellow () 
+{ //Serial.print("adjusting");
+  return (Bot.sensors.left() == YELLOW) && (Bot.sensors.right() == YELLOW);
+}
+bool blackblack () 
+{ //Serial.print("adjusting");
+  return (Bot.sensors.left() == BLACK) && (Bot.sensors.right() == BLACK);
+}
 
+bool hall ()
+{
+  return Bot.hall_interrupt;  
+}
+bool collision ()
+{
+  return Bot.collision_interrupt;  
+}
+
+///// TESTING FUNCTION FOR THE HALL EFFECT INTERRUPT
+//////////////////////////////////////////////////////
+
+struct test_delay_data
+{
+    int del;
+    long long temp;
+    int NS;
+};
+
+int test_delay (bool firstrun, void *v) 
+{
+    DBG;
+    test_delay_data *td = (test_delay_data*)v;
+    if (firstrun) {td-> temp = millis();}
+    if (millis() - td-> temp > td-> del) {return td-> NS;}
+    Bot.leds.red_path.on_flash();
+    return 0;
+}
+
+test_delay_data td1 = {6000, 0,69};
+
+//////////////////////////////////////////////////////
+///// TESTING FUNCTION FOR THE HALL EFFECT INTERRUPT
+
+
+/* --------------------------------------------------------------- CHALLENGE 2/3
 static const int light_threshold = 200;
 
 bool headlights_sensed()
 {
 	return analogRead(HEADLIGHT_SENSOR) > light_threshold); 
 }
-
+   ---------------------------------------------------------------  CHALLENGE 2/3 */
 
 void nothing();
 void hall_detect();
@@ -53,6 +115,8 @@ struct talk_data
 struct listen_data 
 {
     int  duration;
+//    int  rising_edge;
+//    int  falling_edge;
     int  deviation;
     bool high;
     long long start_time;
@@ -80,12 +144,11 @@ struct move_data_if
 
 struct flashled_data
 {
-    int leds;
-    int flashes;
-    int on_time;
-    int off_time;
-    int temp1;
-    long long temp2;
+    int  leds;
+    int  flashes;
+    bool last_on;
+    bool started;
+    int  count;
     int  NS;
 };
 
@@ -93,7 +156,7 @@ struct tracktrack_data
 {
   color L; // left color
   color R; // right color
-  color D; // destination color
+  bool (*iff)(); // condition to leave
   int  last_state; // 
   int  ft; // fullthrottle
   int  mt; // mediumthrottle
@@ -105,21 +168,24 @@ struct tracktrack_data
 
 /* BOT 1 Challenge 1 ----------------------------- */
 
-flashled_data   c1b1_initflash          = {RED_LED_FLASH|BLUE_LED_FLASH, 3, 200, 800, 0,0, 69}; // state 1
-talk_data       c1b1_start_talk         = {500,  0  ,10}; // state 5
-flashled_data   c1b1_startflash         = {GREEN_LED_FLASH, 1, 1000, 0, 0, 0, 15}; // state 10
+flashled_data   c1b1_initflash          = {RED_STATE_LED_FLASH|BLUE_STATE_LED_FLASH, 3, false, false, 0, 4};                 // state 1 -> 4
+talk_data       c1b1_start_talk         = {200,  0  ,5};                                                                     // state 4 -> 5
+flashled_data   c1b1_startflash         = {GREEN_STATE_LED_FLASH, 3, false, false,0, 6};                                     // state 5 -> 6
+move_data_if    c1b1_initial_collision1 = {100, collision, MR_* 100, MR_ * 87, 8};                                           // state 6 -> 8
+move_data       c1b1_initial_collision2 = {100, 1000, -150, -200, 0, 10};                                                    // state 8 -> 10
+move_data_if    c1b1_initial_collision3 = {1000, blueblue, 100, 75, 13};                                                     // state 10 -> 13
+tracktrack_data c1b1_track_blue         = {BLUE, BLUE,  yellowyellow, LEFT_TRACK, MR_*50, MR_*0,MR_*-50, 750, false, 14};    // state 13 -> 14
+move_data       c1b1_forward_smidge1    = {100, 200, MR_*100, MR_*100, 0, 15};;                                              // state 14 -> 15
+move_data       c1b1_right_90           = {100, 340, MR_*100, MR_*-100, 0, 20};                                              // state 15 -> 20
+tracktrack_data c1b1_track_yellow       = {YELLOW, YELLOW, blackblack, LEFT_TRACK, MR_*50,MR_*0,MR_*-50, 750, true, 25};     // state 20 -> 25
+move_data       c1b1_left_90            = {100, 350, MR_*-150, MR_*50, 0, 27};                                               // state 25 -> 27
+move_data       c1b1_forward_jolt       = {100, 200, MR_*100, MR_*100, 0, 30};                                               // state 27 -> 30 
+tracktrack_data c1b1_track_red          = {RED, RED, hall, LEFT_TRACK, MR_*50,MR_*0,MR_*-50, 750,false, 35};                 // state 30 -> 35
+move_data       c1b1_stop_hall_jolt1    = {100, 1000, 0, 0, 0, 36};                                                          // state 35 -> 36
+move_data       c1b1_turn_tcc_jolt      = {100, 700, 0, -70, 0, 38};                                                         // state 36 -> 38
+talk_data       c1b1_start_talk_tcc     = {200,  0  ,45};                                                                    // state 38 -> 45 (200 ms?)
+move_data       c1b1_turn_tcc_jolt2     = {100, 700, 0, 70, 0, 69};                                                          // state 45 -> 50
 
-move_data       c1b1_starting_run1      = {100, 2000, 200, 200,  0, 10}; // state 1 -> 10
-move_data       c1b1_starting_run2      = {100, 550, -150, -200, 0, 12}; // state 10-> 12 
-move_data       c1b1_starting_run3      = {10000, 300, 100, -200,0, 69}; // state 12 -> 69
-
-
-
-tracktrack_data c1b1_track_red          = {BLUE, BLUE,  YELLOW, LEFT_TRACK, MR_*50, MR_*0,MR_*-50, 750, false, 15};  // state 10
-move_data       c1b1_right_90           = {100, 340, MR_*150, MR_*-50, 0, 20};                           // state 15 -> 20 
-tracktrack_data c1b1_track_yellow       = {YELLOW, YELLOW, NONE, LEFT_TRACK, MR_*50,MR_*0,MR_*-50, 750, true, 25}; // state 20 -> 25
-move_data       c1b1_left_90            = {100, 350, MR_*-150, MR_*50, 0, 30};                           // state 25 -> 30 
-tracktrack_data c1b1_track_blue         = {RED, RED, NONE, LEFT_TRACK, MR_*50,MR_*0,MR_*-50, 750,false, 69}; // state 30 -> 35
 /*
 
 ABOVE IS SUPID
@@ -130,9 +196,7 @@ move_data       c1b1_right_90           = {100, 340, 150, -50, 0, 20};          
 tracktrack_data c1b1_track_yellow       = {YELLOW, YELLOW, NONE, LEFT_TRACK, 50,0,-50, 750, true, 25}; // state 20 -> 25
 move_data       c1b1_left_90            = {100, 350, -50, 150, 0, 30};                           // state 25 -> 30 
 tracktrack_data c1b1_track_blue         = {BLUE, BLUE, NONE, LEFT_TRACK, 50,50,-50, 750,false, 69}; // state 30 -> 35
-
-
-
+f
 
  struct move_data
 {
@@ -153,7 +217,6 @@ tracktrack_data c1b1_track_blue         = {BLUE, BLUE, NONE, LEFT_TRACK, 50,50,-
 move_data c1b1_run_person_over_part1 = {100,340,0,-150,0,90};
 talk_data c1b1_run_person_over_part2 = {200, 0, -1};
 
-
 int none (bool first_run, void *v)
 {
   (void) first_run; (void) v;
@@ -168,10 +231,11 @@ int pop (bool first_run, void *v)
 
 
 /* DO_NOTHING ---------------------------------------------------------------------- */
-int hardware_stop (bool first_run, void *v)
+int hardware_stop (bool firstrun, void *v)
 {
-    (void) first_run; (void) v;
-    if (first_run){
+    if(firstrun) DBG;
+    (void) firstrun; (void) v;
+    if (firstrun){
         //Serial.println("hardware off");
         Bot.lmotor.set_transition(CURRENT_SPEED,0, 100, LINEAR_SLOPE);
         Bot.rmotor.set_transition(CURRENT_SPEED,0, 100, LINEAR_SLOPE);
@@ -184,14 +248,15 @@ int hardware_stop (bool first_run, void *v)
 /* TRACKTRACK ---------------------------------------------------------------------- */
 int tracktrack (bool firstrun, void *v) 
 {
-
+  if(firstrun) DBG;
   //DBG;
   tracktrack_data *ttd = (tracktrack_data*)v;
   int last_off = 0;
   
   if (firstrun) {
-      //Serial.println("SET_ME_ON_FIRE");
       // initially set motors to full throttle
+      Bot.enable_hall_interrupt();
+      Bot.enable_collision_interrupt();
       Bot.lmotor.set_transition(CURRENT_SPEED, ttd->ft, ttd->slope, LINEAR_SLOPE);
       Bot.rmotor.set_transition(CURRENT_SPEED, ttd->ft, ttd->slope, LINEAR_SLOPE);
       return 0;
@@ -199,14 +264,7 @@ int tracktrack (bool firstrun, void *v)
   
   // TODO: MAKE VARIABLE
   // IF EITHER MOTOR IS ON THE DESIRED COLOR, THEN TRANSITION
-  if (ttd->D == NONE && Bot.collision_interrupt) {
-      Bot.collision_interrupt = 0;                            // IF SOMETHING IS GOING WRONG THEN 
-      Bot.collision_interrupt_last = 0;                       // IT WILL BE WITH THIS !!!!!!!!!!!!!!!!!!!!!
-      return ttd -> NS;
-  } else if (ttd->D == Bot.sensors.right() || ttd->D == Bot.sensors.left()) {
-      Bot.show_following_path(NONE);
-      return ttd->NS;
-  }
+  if( ttd->iff() ) return ttd-> NS;
   
   // FOR THE TRACK BEING ON THE RIGHT -> ATTEND TO LEFT ERROR FIRST
   
@@ -265,120 +323,95 @@ struct tracktrack_data
 
 */
 
-int trackytrack (bool firstrun, void *v)
-{
-    tracktrack_data* ttd = (tracktrack_data*)v;
-    if (ttd->R != Bot.sensors.right()) {
-        Bot.lmotor.set_transition(CURRENT_SPEED, ttd->lt, ttd->slope, LINEAR_SLOPE);
-        Bot.rmotor.set_transition(CURRENT_SPEED, ttd->mt, ttd->slope, LINEAR_SLOPE);
-    } else if (ttd->L != Bot.sensors.left()) {
-        Bot.rmotor.set_transition(CURRENT_SPEED, ttd->lt, ttd->slope, LINEAR_SLOPE);
-        Bot.lmotor.set_transition(CURRENT_SPEED, ttd->mt, ttd->slope, LINEAR_SLOPE);
-    } else {
-        Bot.rmotor.set_transition(CURRENT_SPEED, ttd->ft, ttd->slope, LINEAR_SLOPE);
-        Bot.lmotor.set_transition(CURRENT_SPEED, ttd->ft, ttd->slope, LINEAR_SLOPE);      
-    }
-
-    if (ttd->D == Bot.sensors.right() || ttd->D == Bot.sensors.left()) {
-      Bot.show_following_path(NONE);
-      return ttd->NS;
-    }
-}
 
 /* MOVEBOT ---------------------------------------------------------------------- */
 int move_time (bool firstrun, void *v) 
 {
-  move_data *md = (move_data*)v;
-
-
-  // TURN ON LEFT TURN SIGNAL IF RIGHT MOTOR IS GOING FASTER THAN THE LEFT
-  // TURN ON RIGHT TURN SIGNAL IF LEFT MOTOR IS GOING FASTER THAN THE RIGHT
-  // TURN ON BREAK LIGHTS IF BOTH ARE SLOWING DOWN AND NOT TURNING
+    move_data *md = (move_data*)v;
   
-  if (firstrun) {
-
-      Bot.lmotor.set_transition(CURRENT_SPEED, md->Lmotor_speed, md->ramp_time, LINEAR_DURATION);
-      Bot.rmotor.set_transition(CURRENT_SPEED, md->Rmotor_speed, md->ramp_time, LINEAR_DURATION);
-      md-> start_time = millis();
-      
-      return 0;
-  }
-  
-  if (md->run_time < (millis() - md->start_time)) {
-      DBG;
-      return md -> NS;
-  }
-}
-
-int move_collision (bool firstrun, void *v) 
-{
-  move_data *md = (move_data*)v;
-
-
-  // TURN ON LEFT TURN SIGNAL IF RIGHT MOTOR IS GOING FASTER THAN THE LEFT
-  // TURN ON RIGHT TURN SIGNAL IF LEFT MOTOR IS GOING FASTER THAN THE RIGHT
-  // TURN ON BREAK LIGHTS IF BOTH ARE SLOWING DOWN AND NOT TURNING
-  
-  if (firstrun) {
-
-      Bot.lmotor.set_transition(CURRENT_SPEED, md->Lmotor_speed, md->ramp_time, LINEAR_DURATION);
-      Bot.rmotor.set_transition(CURRENT_SPEED, md->Rmotor_speed, md->ramp_time, LINEAR_DURATION);
-      return 0;
-  }
-  
-  if (Bot.collision_interrupt) {
-      Bot.collision_interrupt = 0;
-      Bot.collision_interrupt_last = 0;
-      return md -> NS;
-  }
-}
-
-int move_if (bool firstrun, void *v) 
-{
-    DBG;
-    move_data_if *md = (move_data_if*)v;
+    if(firstrun) DBG;
+    // TURN ON LEFT TURN SIGNAL IF RIGHT MOTOR IS GOING FASTER THAN THE LEFT
+    // TURN ON RIGHT TURN SIGNAL IF LEFT MOTOR IS GOING FASTER THAN THE RIGHT
+    // TURN ON BREAK LIGHTS IF BOTH ARE SLOWING DOWN AND NOT TURNING
     
     if (firstrun) {
         Bot.lmotor.set_transition(CURRENT_SPEED, md->Lmotor_speed, md->ramp_time, LINEAR_DURATION);
         Bot.rmotor.set_transition(CURRENT_SPEED, md->Rmotor_speed, md->ramp_time, LINEAR_DURATION);
+        md-> start_time = millis();
         return 0;
     }
+  
+    if (md->Lmotor_speed > md->Rmotor_speed + TURNSIGNAL_THRESHOLD ) {
+        Bot.leds.rturn.on_flash();
+    } else if (md->Rmotor_speed > md->Lmotor_speed + TURNSIGNAL_THRESHOLD ) {
+        Bot.leds.lturn.on_flash();
+    }
+    
+    if (md->run_time < (millis() - md->start_time)) {
+        return md -> NS;
+    }
+}
+
+int move_if (bool firstrun, void *v) 
+{
+    if(firstrun) DBG;
+    move_data_if *md = (move_data_if*)v;
+    
+
+    
+    if (firstrun) {
+        Bot.enable_hall_interrupt ();
+        Bot.enable_collision_interrupt ();
+        Bot.lmotor.set_transition(CURRENT_SPEED, md->Lmotor_speed, md->ramp_time, LINEAR_DURATION);
+        Bot.rmotor.set_transition(CURRENT_SPEED, md->Rmotor_speed, md->ramp_time, LINEAR_DURATION);
+        return 0;
+    }
+    
+    if (md->Lmotor_speed > md->Rmotor_speed + TURNSIGNAL_THRESHOLD ) {
+        Bot.leds.rturn.on_flash();
+    } else if (md->Rmotor_speed > md->Lmotor_speed + TURNSIGNAL_THRESHOLD ) {
+        Bot.leds.lturn.on_flash();
+    }
+    
     if( md->iff() ) return md-> NS;
     return 0;
 }
 
 /* FLASHLEDS ---------------------------------------------------------------------- */
+
 int flashled (bool firstrun, void *v) 
 {
+    if(firstrun) DBG;
     flashled_data *fd = (flashled_data*)v;
+    bool flash_high   = Bot.leds.flashing_on();
+
     if (firstrun) {
-        fd-> temp1 = fd-> flashes << 1;
-        fd-> temp2 = millis();
+        fd-> count   = fd-> flashes; 
+        fd-> started = !flash_high; // if the lights are off
+        fd->last_on  = false;
+    }
+
+    // if not started and the lights are on, start
+    if (!fd-> started && flash_high) {fd-> started = true;}
+    
+    if (fd-> started) {
+      
+        if (!flash_high && (fd->last_on)) { fd-> count--;}
+        fd-> last_on = flash_high;
+        if (fd->count <= 0) { return fd-> NS;}
+        
+        if (fd->leds & RED_STATE_LED_FLASH)   Bot.leds.red_state.on_flash();
+        if (fd->leds & GREEN_STATE_LED_FLASH) Bot.leds.green_state.on_flash();
+        if (fd->leds & BLUE_STATE_LED_FLASH)  Bot.leds.blue_state.on_flash();
+        if (fd->leds & RED_PATH_LED_FLASH)    Bot.leds.red_path.on_flash();
+        if (fd->leds & BLUE_PATH_LED_FLASH)   Bot.leds.blue_path.on_flash();
+        if (fd->leds & YELLOW_PATH_LED_FLASH) Bot.leds.yellow_path.on_flash();
+        if (fd->leds & HEADLIGHT_LED_FLASH)   Bot.leds.headlights.on_flash();
+        if (fd->leds & BREAKLIGHT_LED_FLASH)  Bot.leds.breaklights.on_flash();
+        if (fd->leds & LTURN_LED_FLASH)       Bot.leds.lturn.on_flash();
+        if (fd->leds & RTURN_LED_FLASH)       Bot.leds.rturn.on_flash(); 
     }
     
-    if (!(fd-> temp1 & 1)) { // LED ON
-        if (fd-> on_time > millis() - fd-> temp2) {
-            if ((fd->leds) & RED_LED_FLASH)   Bot.red_state_led_on();
-            if ((fd->leds) & BLUE_LED_FLASH)  Bot.blue_state_led_on();
-            if ((fd->leds) & GREEN_LED_FLASH) Bot.green_state_led_on();
-        } else {
-            fd-> temp2 = millis();
-            if ((fd-> temp1) == 0) return fd-> NS;
-            --(fd-> temp1);
-            if ((fd-> temp1) == 0) return fd-> NS;
-        }
-    } else { // LED OFF
-        if (fd-> off_time > millis() - fd-> temp2) {
-            if ((fd->leds) & RED_LED_FLASH)   Bot.red_state_led_off();
-            if ((fd->leds) & BLUE_LED_FLASH)  Bot.blue_state_led_off();
-            if ((fd->leds) & GREEN_LED_FLASH) Bot.green_state_led_off();
-        } else {
-            fd-> temp2 = millis();
-            if ((fd-> temp1) == 0) return fd-> NS;
-            --(fd-> temp1);
-            if ((fd-> temp1) == 0) return fd-> NS;
-        }
-    }
     return 0;
 }
 
@@ -386,12 +419,14 @@ int flashled (bool firstrun, void *v)
 int talk (bool firstrun, void *v) 
 {
     talk_data *td = (talk_data *)v;
-    
-    attachInterrupt(digitalPinToInterrupt(HALL), nothing, FALLING);      //
-    attachInterrupt(digitalPinToInterrupt(COLLISION), nothing, FALLING); //
+    if(firstrun) DBG;
+    Bot.disable_hall_interrupt();
+    Bot.disable_collision_interrupt();
     
     if (firstrun) {
         Bot.sending_on();
+        Bot.lmotor.set_transition(CURRENT_SPEED, 0, 100, LINEAR_DURATION);
+        Bot.rmotor.set_transition(CURRENT_SPEED, 0, 100, LINEAR_DURATION);
         td -> start_time = millis();   
     }
 
@@ -400,16 +435,31 @@ int talk (bool firstrun, void *v)
         return  0;
     } else {
         Bot.sending_off();
-        attachInterrupt(digitalPinToInterrupt(HALL), hall_detect, FALLING);           //
-        attachInterrupt(digitalPinToInterrupt(COLLISION), collision_detect, FALLING); //
+        Bot.enable_hall_interrupt();
+        Bot.enable_collision_interrupt();
         return td-> NS; 
     }
 }
 
 /* LISTEN ---------------------------------------------------------------------- */
-int listen_ (bool firstrun, void *v) 
+/*
+struct listen_data 
 {
+    int  duration;
+    int  rising_edge;
+    int  falling_edge;
+    bool high;
+    long long start_time;
+    int NS;
+};
+*/
+
+int listen (bool firstrun, void *v) 
+{
+    if(firstrun) DBG;
     listen_data *ld = (listen_data *)v;
+
+    
     
     if (firstrun) {
         ld -> high = false;
@@ -433,8 +483,8 @@ int listen_ (bool firstrun, void *v)
         }
     }
 }
-
-/* BOT 1 Challenge 2 ----------------------------- */
+/*
+// BOT 1 Challenge 2 ----------------------------- 
 static const int FWD_TRAVEL_SPD = 200;
 static const int INCH_TRAVEL 	= 150;
 static const int TURN_WHEEL_SPD 	= -100;
@@ -456,7 +506,7 @@ move_data       c2b1_right_3      		= {100, TURN_90, OPP_WHEEL_SPD, TURN_WHEEL_S
 move_data		c2b1_back_to_start		= {100, INCH_TRAVEL*15, -FWD_TRAVEL_SPD, -FWD_TRAVEL_SPD,   0, 65};
 talk_data		c2b1_send_500ms			= {500, 0, 69};
 
-/* BOT 2 Challenge 2 ----------------------------- */
+// BOT 2 Challenge 2 ----------------------------- 
 talk_data		c2b2_send_500ms			= {500, 0, 2};
 listen_data 	c2b2_rcv_500ms			= {515, 30, 1, 0, 5};
 move_data       c2b2_fwd_12in           = {100, INCH_TRAVEL*12, FWD_TRAVEL_SPD, FWD_TRAVEL_SPD,   0, 10};
@@ -472,17 +522,17 @@ move_data       c2b2_lightstop_2      	= {100, 500,	0,	 0,	  0, 55};
 move_data       c2b2_right_3      		= {100, TURN_90, OPP_WHEEL_SPD, TURN_WHEEL_SPD, 60};
 move_data		c2b2_back_to_start		= {100, INCH_TRAVEL*15, -FWD_TRAVEL_SPD, -FWD_TRAVEL_SPD,   0, 69};
 
-/* BOT 1 Challenge 3 -------------------------------- */
+// BOT 1 Challenge 3 -------------------------------- 
 move_data_if 	c3b1_forward_light		= {100, headlights_sensed, FWD_TRAVEL_SPD, FWD_TRAVEL_SPD, 5);
 move_data       c3b1_stop_5s      		= {100, 5000,	0,	 0,	  0, 10};
 talk_data		c3b1_send_500ms			= {500, 0, 15};
 flashled_data 	c3b1_flash_head_twice	= {};	
 flashed_data 	c3b1_illuminate_turn	= {};
 
-/* BOT 1 Challenge 2 -------------------------------- */
+// BOT 1 Challenge 2 -------------------------------- 
 move_data_if 	c3b2_forward_light		= {100, headlights_sensed, FWD_TRAVEL_SPD, FWD_TRAVEL_SPD, 5);
 listen_data		c3b2_rcv_500ms			= {515, 30, 1, 0, 10};
 flashled_data 	c3b2_flash_head_twice	= {};	
 flashed_data 	c3b2_illuminate_turn	= {};
-
+*/
 #endif
