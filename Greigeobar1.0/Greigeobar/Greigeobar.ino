@@ -1,3 +1,6 @@
+
+#define ZINNOBAR
+
 #include "smart_bot.h"
 #include "states.h"
 #include "smart_motor.h"
@@ -46,42 +49,26 @@
 
 #define HALL_DEBOUNCE       250 // DEBOUNCE TIME 
 #define COLLISION_DEBOUNCE  250 // FOR INTERRUPT SENSORS
-
-#define STABILIZATION_TIME 20
+#define STABILIZATION_TIME  20
+#define STARTUP_TIME        2000
 
 bool ROUTINE_STARTED = false;
-
 void startup_script();
 
-// ZINNOBAR
+#ifdef ZINNOBAR
 const float redBsl[NPARAMS+1] = {-3.611066, -11.821438, 18.373480};
 const float bluBsl[NPARAMS+1] = {-9.079246, 11.294321, 1.760701};
 const float redBsr[NPARAMS+1] = {-2.960096, -11.238681, 18.538100};
 const float bluBsr[NPARAMS+1] = {-7.836730, 11.320052, 2.295952};
-
-/*    
-// GREIGE
+#endif
+    
+#ifdef GREIGE
 const float redBsr[NPARAMS+1] = {-6.388153, -12.839205, 22.176529};
 const float bluBsr[NPARAMS+1] = {-13.134911, 19.116380, -2.625003};
 const float redBsl[NPARAMS+1] = {-5.140660, -14.058928, 22.504624};
 const float bluBsl[NPARAMS+1] = {-12.176397, 16.411099, -0.047437};
-*/ 
-/*
-        int yellow_path_pin, int blue_path_pin,  int red_path_pin,
-        int green_state_pin, int blue_state_pin, int red_state_pin,
-        int headlights_pin,  int breaklights_pin,
-        int lturn_pin,       int rturn_pin
+#endif
 
-    lights ( int yellow_path_pin, int blue_path_pin,  int red_path_pin,
-             int green_state_pin, int blue_state_pin, int red_state_pin,
-             int headlights_pin,  int breaklights_pin,
-             int lturn_pin,       int rturn_pin):
-
-        #define L_TURNSIGNAL 0
-        #define R_TURNSIGNAL 1
-        #define BREAKLIGHTS  49
-        #define HEADLIGHTS   25
-*/
 smart_bot Bot ( LED_YELLOW_TRACK, LED_BLUE_TRACK, LED_RED_TRACK,
                 LED_STATE_GREEN, LED_STATE_BLUE , LED_STATE_RED,
                 HEADLIGHTS     ,  BREAKLIGHTS, 
@@ -247,7 +234,24 @@ void collision_detect_startup ()
 }
   
 void startup_script()
-{}
+{
+    long long timer millis();
+    Bot.leds.red_state.on_flash();
+    Bot.leds.green_state.on_flash();
+    Bot.leds.blue_state.on_flash();
+    Bot.leds.red_path.on_flash();
+    Bot.leds.blue_path.on_flash();
+    Bot.leds.yellow_path.on_flash();
+    Bot.leds.headlights.on_flash();
+    Bot.leds.breaklights.on_flash();
+    Bot.leds.lturn.on_flash();
+    Bot.leds.rturn.on_flash();    
+
+    while (STARTUP_TIME > millis() - timer) Bot.leds.maintain();
+
+    Bot.leds.reset();
+    Bot.leds.maintain();
+}
 
 void nothing () {}
 

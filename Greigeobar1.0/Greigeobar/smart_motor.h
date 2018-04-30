@@ -17,6 +17,17 @@
 
 #define CURRENT_SPEED   500
 
+// -------------------- Bot specific data
+#ifdef ZINNOBAR
+#define MOTOR_SCALE 2
+#endif
+
+#ifdef  GREIGE
+#define MOTOR_SCALE 1
+#endif
+// --------------------------------------
+
+
 enum motor_transition
 {
     LINEAR_SLOPE     = 0,
@@ -165,13 +176,13 @@ private:
     int motor_go (int speed) 
     {
         if (speed > 0) {
-            analogWrite (pin1, speed);
+            analogWrite (pin1, MOTOR_SCALE * speed);
             analogWrite (pin2, 0);
             return speed;
         } else {
             speed = -speed;   
             analogWrite (pin1, 0);
-            analogWrite (pin2, speed);
+            analogWrite (pin2, MOTOR_SCALE * speed);
             return -speed;
         }
     }
