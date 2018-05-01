@@ -37,8 +37,8 @@
 #define BLUE_LED       37 //
 
 // communicaton -----// 
-#define RECEIVING A5 //
-#define SENDING   51 //
+#define RECEIVING A14 //
+#define SENDING   53 //
 
 // motors ---------// 
 #define PIN1_M1 6  //
@@ -50,31 +50,35 @@
 #define HALL_DEBOUNCE       250 // DEBOUNCE TIME 
 #define COLLISION_DEBOUNCE  250 // FOR INTERRUPT SENSORS
 #define STABILIZATION_TIME  20
-#define STARTUP_TIME        2000
+#define STARTUP_TIME        1000
 
 bool ROUTINE_STARTED = false;
 void startup_script();
 
 #ifdef ZINNOBAR
-const float redBsl[NPARAMS+1] = {-3.611066, -11.821438, 18.373480};
-const float bluBsl[NPARAMS+1] = {-9.079246, 11.294321, 1.760701};
-const float redBsr[NPARAMS+1] = {-2.960096, -11.238681, 18.538100};
-const float bluBsr[NPARAMS+1] = {-7.836730, 11.320052, 2.295952};
+#define MOTORR_RATIO 1.0
+#define MOTORL_RATIO 1.0
+const float redBsl[NPARAMS+1] = {-2.977314, -8.032214, 19.278885};
+const float bluBsl[NPARAMS+1] = {-5.763274, 14.854991, 2.136611};
+const float redBsr[NPARAMS+1] = {-3.746024, -18.018052, 29.614442};
+const float bluBsr[NPARAMS+1] = {-6.577071, 19.197097, -7.285963};
 #endif
     
 #ifdef GREIGE
-const float redBsr[NPARAMS+1] = {-6.388153, -12.839205, 22.176529};
-const float bluBsr[NPARAMS+1] = {-13.134911, 19.116380, -2.625003};
-const float redBsl[NPARAMS+1] = {-5.140660, -14.058928, 22.504624};
-const float bluBsl[NPARAMS+1] = {-12.176397, 16.411099, -0.047437};
+#define MOTORR_RATIO 0.9
+#define MOTORL_RATIO 0.9
+const float redBsr[NPARAMS+1] =  {-4.778298, -15.261315, 27.312647};
+const float bluBsr[NPARAMS+1] = {-10.186932, 22.284243, -4.507212};
+const float redBsl[NPARAMS+1] = {-5.795165, -13.741407, 25.120166};
+const float bluBsl[NPARAMS+1] = {-4.256994, 25.752916, -18.000910};
 #endif
 
 smart_bot Bot ( LED_YELLOW_TRACK, LED_BLUE_TRACK, LED_RED_TRACK,
                 LED_STATE_GREEN, LED_STATE_BLUE , LED_STATE_RED,
                 HEADLIGHTS     ,  BREAKLIGHTS, 
                 L_TURNSIGNAL   ,  R_TURNSIGNAL,
-                PIN1_M1, PIN2_M1,
-                PIN1_M2, PIN2_M2, PINE_M,
+                PIN1_M1, PIN2_M1, MOTORR_RATIO,
+                PIN1_M2, PIN2_M2, MOTORL_RATIO, PINE_M,
                 SENDING, RECEIVING,
                 L_LIGHT_SENSOR, R_LIGHT_SENSOR,
                 HALL, COLLISION,
@@ -158,15 +162,14 @@ void loop ()
 
     digitalWrite (L_TURNSIGNAL,LOW);
     digitalWrite (BREAKLIGHTS,HIGH);
-   
-    //digitalWrite (PINE_M,HIGH);
     
     // ----------------------------------
+
+    startup_script();
      
     long long timer = millis ();
     while (!ROUTINE_STARTED) { Bot.sensors.sense();} 
 
-    startup_script();
     // attach the normal interrupt
     attachInterrupt(digitalPinToInterrupt(COLLISION), collision_detect, FALLING);
     
@@ -175,7 +178,7 @@ void loop ()
       + ((digitalRead(STATE_SWITCH_2)^1) << 2) 
       + ((digitalRead(STATE_SWITCH_3)^1) << 1)
       + ((digitalRead(STATE_SWITCH_4)^1) << 0);
-    
+      
     Serial.print  ("ROUTINE [");
     Serial.print  (routine);
     Serial.println("]");
@@ -235,7 +238,8 @@ void collision_detect_startup ()
   
 void startup_script()
 {
-    long long timer millis();
+    Serial.println("running...");
+    long long timer = millis();
     Bot.leds.red_state.on_flash();
     Bot.leds.green_state.on_flash();
     Bot.leds.blue_state.on_flash();

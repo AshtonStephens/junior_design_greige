@@ -17,16 +17,6 @@
 
 #define CURRENT_SPEED   500
 
-// -------------------- Bot specific data
-#ifdef ZINNOBAR
-#define MOTOR_SCALE 2
-#endif
-
-#ifdef  GREIGE
-#define MOTOR_SCALE 1
-#endif
-// --------------------------------------
-
 
 enum motor_transition
 {
@@ -42,6 +32,7 @@ private:
     int pin2;
     
     motor_transition transition;
+    float motor_ratio;
     int current_speed;
     int final_speed;
     float coeff;
@@ -51,8 +42,8 @@ private:
 public:
 
     // declares and make a smart_motor - Sets up pins
-    smart_motor (int pin1, int pin2):
-        pin1(pin1), pin2(pin2), transition(LINEAR_SLOPE),
+    smart_motor (int pin1, int pin2, float motor_ratio):
+        pin1(pin1), pin2(pin2), motor_ratio(motor_ratio), transition(LINEAR_SLOPE),
         current_speed(0), final_speed(0), coeff(0),
         last_update(0) 
     {   
@@ -176,13 +167,18 @@ private:
     int motor_go (int speed) 
     {
         if (speed > 0) {
-            analogWrite (pin1, MOTOR_SCALE * speed);
+            analogWrite (pin1, (int)(motor_ratio * speed));
+
+            VAR_(motor_ratio);
+            VAR_(speed);
+            VAR_((int)(motor_ratio * speed));
             analogWrite (pin2, 0);
             return speed;
         } else {
             speed = -speed;   
             analogWrite (pin1, 0);
-            analogWrite (pin2, MOTOR_SCALE * speed);
+            analogWrite (pin2, (int)(motor_ratio * speed));
+            Serial.print(motor_ratio * speed);
             return -speed;
         }
     }

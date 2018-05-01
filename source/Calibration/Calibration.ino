@@ -11,9 +11,9 @@
 #define BLUE_LED_PIN 37
 #define  RED_LED_PIN 39
 
-#define   SENSOR_PIN A6
+#define   SENSOR_PIN A7
 
-#define STABILIZATION_TIME 20
+#define STABILIZATION_TIME 30
 
 #include "regression2.h"
 #include "csensor.h"
@@ -49,7 +49,7 @@ void calibrate ()
       if (seed_count == -1) {
          Serial.print("\n\n// #define NSEEDS ");
          Serial.print(NSEEDS);
-         Serial.print("\ncalibration_data c[NSEEDS]");
+         Serial.print("\ncalibration_data C1[NSEEDS]=");
          Serial.print("\n{");
          seed_count = 0;
          calib_print_color(c[seed_count]);

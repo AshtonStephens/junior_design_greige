@@ -15,7 +15,7 @@
 
 // MAKE MORE PROMINENT
 typedef float Betas[NPARAMS+1];
-//#define DEBUG_CSENSOR
+#define DEBUG_CSENSOR
 
 class csensor 
 {
@@ -142,20 +142,20 @@ class csensor
         
         color_left  = predict_full(readings_left ,redB_left ,bluB_left ); 
         color_right = predict_full(readings_right,redB_right,bluB_right); 
-        
-
+       
         #ifdef DEBUG_CSENSOR 
         /*
         print_readings(readings_left,readings_right);
         */
         /* --------------------------------------------------------- */
-           
+        print_readings(readings_left,readings_right);
+  /*
         Serial.print("[");
         print_color(color_left);
         Serial.print("][");
         print_color(color_right);
         Serial.println("]");
-         
+    */     
         
         #endif
     }

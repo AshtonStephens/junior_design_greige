@@ -49,8 +49,8 @@ public:
         int headlights_pin,  int breaklights_pin,
         int lturn_pin,       int rturn_pin,
         // MOTORS
-        int mpin1_R, int mpin2_R,
-        int mpin1_L, int mpin2_L, int mpinE,
+        int mpin1_R, int mpin2_R, float m1r,
+        int mpin1_L, int mpin2_L, float m2r, int mpinE,
         int comms_sending, int comms_receiving,
         // COLOR SENSORS
         int sensor_pin_left, int sensor_pin_right,
@@ -65,8 +65,8 @@ public:
             lturn_pin,       rturn_pin),
             comms_sending(comms_sending), 
             comms_receiving(comms_receiving), 
-            rmotor(mpin1_R,mpin2_R),
-            lmotor(mpin1_L,mpin2_L), mpinE(mpinE),
+            rmotor(mpin1_R,mpin2_R,m1r),
+            lmotor(mpin1_L,mpin2_L,m2r), mpinE(mpinE),
             hall_pin(hall_pin), collision_pin(collision_pin),
             sensors(sensor_pin_left,sensor_pin_right,
                     red_pin, blue_pin, stabilization_time,
@@ -133,7 +133,7 @@ public:
 
     void sending_on() {digitalWrite(comms_sending, HIGH);}
     void sending_off() {digitalWrite(comms_sending, LOW );}
-    bool receiving ()  {return digitalRead(comms_receiving);}
+    int  receive ()  {return analogRead(comms_receiving);}
     void poll_sensors () {sensors.sense();}
 
     void disable_hall_interrupt      () {attachInterrupt(digitalPinToInterrupt(hall_pin), nothing, FALLING);}

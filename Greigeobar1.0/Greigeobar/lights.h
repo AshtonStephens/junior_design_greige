@@ -16,7 +16,7 @@
 #define LED_ON_FLASH 2
 
 //#define FLASH_MASK 1 << 9
-#define FLASH_MASK 1 << 7
+#define FLASH_MASK 1 << 6
 
 struct light 
 {
