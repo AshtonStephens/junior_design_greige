@@ -36,17 +36,18 @@
 #define RED_LED        39 //
 #define BLUE_LED       37 //
 
-// communicaton -----// 
+// communicaton ----- // 
 #define RECEIVING A14 //
-#define SENDING   53 //
+#define SENDING   38  //
 
-// motors ---------// 
+
 #define PIN1_M1 6  //
 #define PIN2_M1 7  //
 #define PIN1_M2 5  //
 #define PIN2_M2 4  //
 #define PINE_M  21 // 
 
+// ---------------------------------------------- //
 #define HALL_DEBOUNCE       250 // DEBOUNCE TIME 
 #define COLLISION_DEBOUNCE  250 // FOR INTERRUPT SENSORS
 #define STABILIZATION_TIME  20
@@ -56,22 +57,28 @@ bool ROUTINE_STARTED = false;
 void startup_script();
 
 #ifdef ZINNOBAR
-#define MOTORR_RATIO 1.0
-#define MOTORL_RATIO 1.0
-const float redBsl[NPARAMS+1] = {-2.977314, -8.032214, 19.278885};
-const float bluBsl[NPARAMS+1] = {-5.763274, 14.854991, 2.136611};
-const float redBsr[NPARAMS+1] = {-3.746024, -18.018052, 29.614442};
-const float bluBsr[NPARAMS+1] = {-6.577071, 19.197097, -7.285963};
+#define MOTORR_RATIO 0.9
+#define MOTORL_RATIO 0.9
+const float redBsl[NPARAMS+1] = {-5.328314, -13.148070, 23.613085};
+const float bluBsl[NPARAMS+1] = {-10.223347, 18.549933, -0.996931};
+const float redBsr[NPARAMS+1] = {-4.765302, -12.646533, 22.950511};
+const float bluBsr[NPARAMS+1] = {-9.143999, 19.150152, -2.333729};
 #endif
     
 #ifdef GREIGE
 #define MOTORR_RATIO 0.9
 #define MOTORL_RATIO 0.9
+ 
+
 const float redBsr[NPARAMS+1] =  {-4.778298, -15.261315, 27.312647};
 const float bluBsr[NPARAMS+1] = {-10.186932, 22.284243, -4.507212};
 const float redBsl[NPARAMS+1] = {-5.795165, -13.741407, 25.120166};
 const float bluBsl[NPARAMS+1] = {-4.256994, 25.752916, -18.000910};
 #endif
+
+
+
+
 
 smart_bot Bot ( LED_YELLOW_TRACK, LED_BLUE_TRACK, LED_RED_TRACK,
                 LED_STATE_GREEN, LED_STATE_BLUE , LED_STATE_RED,

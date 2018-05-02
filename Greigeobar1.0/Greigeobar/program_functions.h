@@ -126,12 +126,13 @@ struct tracktrack_data
   color L;          // left color
   color R;          // right color
   bool (*iff)();    // condition to leave
-  int  last_state;  // 
   int  ft;          // fullthrottle
   int  mt;          // mediumthrottle
   int  lt;          // lowthrottle
   int  slope;       // duration of motor change
   int  NS ;         // next state
+  /* ---- TEMPS ---- */
+  int  last_state;  // 
 };
 
 /* BOT 1 Challenge 1 ----------------------------- */
@@ -146,34 +147,58 @@ struct tracktrack_data
     long long start_time;
 };*/
 
-flashled_data   c1b1_initflash          = {RED_STATE_LED_FLASH|BLUE_STATE_LED_FLASH, 3, 4};                      // state 1 -> 4
-talk_data       c1b1_start_talk         = {200, 5};                                                              // state 4 -> 5
-flashled_data   c1b1_startflash         = {GREEN_STATE_LED_FLASH, 3, 6};                                         // state 5 -> 6
-move_if_data    c1b1_initial_collision1 = {100, collision,   100, 100, 8};                                       // state 6 -> 8
-move_time_data  c1b1_initial_collision2 = {100, 1000, -75, -100, 10};                                         // state 8 -> 10
-move_if_data    c1b1_initial_collision3 = {1000, blueblue, 100, 90, 13};                                         // state 10 -> 13
-tracktrack_data c1b1_track_blue         = {BLUE, BLUE,  yellowyellow, LEFT_TRACK,  70,  0, -50, 750, 14}; // state 13 -> 14
-move_time_data  c1b1_forward_smidge1    = {100, 200,  100,  100, 15};;                                        // state 14 -> 15
-move_time_data  c1b1_right_90           = {100, 300,  100,  -100, 20};                                        // state 15 -> 20
-tracktrack_data c1b1_track_yellow       = {YELLOW, YELLOW, blackblack, LEFT_TRACK,  70, 0, -50, 750, 25};  // state 20 -> 25
-move_time_data  c1b1_left_90            = {100, 350,  -150,  50, 27};                                         // state 25 -> 27
-move_time_data  c1b1_forward_jolt       = {100, 200,  100,  100, 30};                                         // state 27 -> 30 
-tracktrack_data c1b1_track_red          = {RED, RED, hall, LEFT_TRACK,  70, 0, -50, 750, 35};              // state 30 -> 35
-move_time_data  c1b1_stop_hall_jolt1    = {100, 1000, 0, 0,  36};                                              // state 35 -> 36
-move_time_data  c1b1_turn_tcc_jolt      = {100, 700, 0, -130, 38};                                            // state 36 -> 38 // angle to TCC
+/* --------------------------------------------------- *
+ |  bot 1 challenge 1                                  |
+ * --------------------------------------------------- */
+flashled_data   c1b1_initflash          = {RED_STATE_LED_FLASH|BLUE_STATE_LED_FLASH, 3, 4};    // state 1 -> 4
+talk_data       c1b1_start_talk         = {500, 5};                                            // state 4 -> 5
+flashled_data   c1b1_startflash         = {GREEN_STATE_LED_FLASH, 3, 6};                       // state 5 -> 6
+move_if_data    c1b1_initial_collision1 = {100, collision,   100, 100, 8};                     // state 6 -> 8
+move_time_data  c1b1_initial_collision2 = {100, 750, -75, -100, 10};                           // state 8 -> 10
+move_if_data    c1b1_initial_collision3 = {1000, blueblue, 80, 70, 13};                        // state 10 -> 13
+tracktrack_data c1b1_track_blue         = {BLUE, BLUE,  yellowyellow,  70,  0, -40, 750, 14};  // state 13 -> 14
+move_time_data  c1b1_forward_smidge1    = {100, 200,   70,   70, 15};;                         // state 14 -> 15
+move_time_data  c1b1_right_90           = {100, 340,  70,  -70, 20};                           // state 15 -> 20
+tracktrack_data c1b1_track_yellow       = {YELLOW, YELLOW, blackblack,  70, 0, -40, 750, 25};  // state 20 -> 25
+move_time_data  c1b1_left_90            = {100, 350,  -150,  50, 27};                          // state 25 -> 27
+move_time_data  c1b1_forward_jolt       = {100, 200,  100,  100, 30};                          // state 27 -> 30 
+tracktrack_data c1b1_track_red          = {RED, RED, hall,  70, 0, -40, 750, 35};              // state 30 -> 35
+/*                                                     *
+ |  bot 1 after detecting hall sensor                  |
+ * --------------------------------------------------- */
+move_time_data  c1b1_stop_hall_jolt1    = {100, 1000, 0, 0,  36};                              // state 35 -> 36
+move_time_data  c1b1_turn_tcc_jolt      = {100, 700, 0, -130, 38};                             // state 36 -> 38 // angle to TCC
 
 // TODO: ensure that this is the right timing 
-talk_data       c1b1_start_talk_tcc     = {200, 45};                                                        // state 38 -> 45 (200 ms?) // message 1
+flashled_data   c1b1_tcc200ms_flash     = {GREEN_STATE_LED_FLASH, 3, 40};                      // state 38 -> 40 
+talk_data       c1b1_start_talk_tcc     = {200, 43};                                           // state 40 -> 43 (200 ms?) // message 1
 
 // TODO: ensure that this is the right timing make sure this is the right threshold
-listen_data     c1b1_start_tisten_tcc   = {200, 300, 200, 50, XX};                                               // state 38 -> 45 (200 ms?) // message 1
+listen_data     c1b1_start_tisten_tcc   = {200, 300, 200, 50, 45, BLUE_STATE_LED_FLASH};       // state 43 -> 45 (200 ms?) // message 1
 
-move_time_data  c1b1_turn_tcc_jolt2     = {100, 700, 0, 130, XX};                                             // state // angle back to road
-tracktrack_data c1b1_track_red_to_wall  = {RED, RED, collision, LEFT_TRACK,  70, 0, -50, 750, XX};         // state 
-flashled_data   c1b1_redwall_flash      = {RED_STATE_LED_FLASH, 3, XX};                                          // state
-move_time_data  c1b1_back_from_redwall  = {100, 1000, 0, 0, XX};                                              // state
-move_time_data  c1b1_turn_to_tcc_2      = {100, 1000, 0, 0, XX};                                              // state
-talk_data       c1b1_talk_tcc_2         = {300, 45};                                                        // state 38 -> 45 (200 ms?) // message 1
+move_time_data  c1b1_turn_tcc_jolt2     = {100, 700, 0, 130, 48};                              // state 45 -> 48 // angle back to road
+tracktrack_data c1b1_track_red_to_wall  = {RED, RED, collision,  70, 0, -40, 750, 50};         // state 48 -> 50
+flashled_data   c1b1_redwall_flash      = {RED_STATE_LED_FLASH, 3, 53};                        // state 50 -> 53
+move_time_data  c1b1_back_from_redwall  = {100, 1000, 0, 0, 55};                               // state 53 -> 55
+
+move_time_data  c1b1_turn_90_to_bot     = {100, 350,  -150,  50, 57};                          // state 55 -> 57
+move_time_data  c1b1_turn_135_to_tcc    = {100, 500,  -150,  50, 58};                          // state 57 -> 58
+talk_data       c1b1_start_talk_tcc     = {300, 59};                                           // state 58 -> 59 (300 ms)  // message 2
+
+move_time_data  c1b1_turn_135_to_bot    = {100, 500,  50,  -150, 60};                          // state 59 -> 60
+
+/*                                                     *
+ |  bot 2 starts its test                              |
+ * --------------------------------------------------- */
+
+listen_data     c1b1_listen_bot2_start  = {500, 300, 200, 50, 62, BLUE_STATE_LED_FLASH};       // state 60 -> 62 (RCV 500 ms) // bot 2 START message
+flashled_data   c1b1_receive_startflash = {GREEN_STATE_LED_FLASH, 3, 64};                      // state 62-> 64 
+
+listen_data     c1b1_listen_bot2_finish = {500, 300, 200, 50, 66, BLUE_STATE_LED_FLASH};       // state 64 -> 66 (RCV 500 ms) // bot 2 FINISH message
+move_if_data    c1b1_final_collision    = {100, collision,   100, 100, 68};                    // state 66 -> 68
+flashled_data   c1b1_final_flash        = {HEADLIGHT_LED_FLASH | BREAKLIGHT_LED_FLASH |
+                                           LTURN_LED_FLASH     | RTURN_LED_FLASH, 10, 69};     // state 68 -> 69
+
 
 
 /* BOT 1 Challenge 1 ----------------------------- */
@@ -186,7 +211,21 @@ talk_data       c1b1_talk_tcc_2         = {300, 45};                            
     int NS;
     bool high;
     long long start_time;
-};*/
+};
+
+
+struct move_time_data
+{
+  int ramp_time;
+  int run_time;
+  int Lmotor_speed; 
+  int Rmotor_speed;
+  int NS; 
+  long long start_time;
+};
+
+
+*/
 
 
 listen_data    listen_test     = {400, 300, 200, 50, 6, BLUE_PATH_LED_FLASH};                               // state 1 -> 69
@@ -381,6 +420,8 @@ int flashled (bool firstrun, void *v)
     bool flash_high   = Bot.leds.flashing_on();
 
     if (firstrun) {
+        Bot.lmotor.set_transition(CURRENT_SPEED, 0, 100, LINEAR_DURATION);
+        Bot.rmotor.set_transition(CURRENT_SPEED, 0, 100, LINEAR_DURATION);
         fd-> count   = fd-> flashes; 
         fd-> started = !flash_high; // if the lights are off
         fd->last_on  = false;
@@ -457,7 +498,9 @@ int listen (bool firstrun, void *v)
     int input_signal = Bot.receive();
     int signal_time;
 
-    if (firstrun) {
+    if (firstrun) {       
+        Bot.lmotor.set_transition(CURRENT_SPEED, 0, 100, LINEAR_DURATION);
+        Bot.rmotor.set_transition(CURRENT_SPEED, 0, 100, LINEAR_DURATION);
         ld -> high = false;
     }
     

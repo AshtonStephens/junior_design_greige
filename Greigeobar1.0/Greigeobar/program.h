@@ -36,7 +36,7 @@ state_initializer STATE_PROGRAM [] =
     {THREAD_1, 5,{flashled,&c1b1_startflash}},          // state 5 -> 6
     {THREAD_1, 6,{move_if,&c1b1_initial_collision1}},   // state 6 -> 8
     {THREAD_1, 8,{move_time,&c1b1_initial_collision2}}, // state 8 -> 10
-    {THREAD_1,10,{move_if,&c1b1_initial_collision3}},   // state 10 -> 13
+    {THREAD_1,10,{move_if,&c1b1_initial_collision3}},   // state 10 -> 13 // 10
     {THREAD_1,13,{tracktrack,&c1b1_track_blue}},        // state 13 -> 14
     {THREAD_1,14,{move_time,&c1b1_forward_smidge1}},    // state 14 -> 15
     {THREAD_1,15,{move_time,&c1b1_right_90}},           // state 15 -> 20

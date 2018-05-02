@@ -122,7 +122,7 @@ public:
         _VAR(current_speed);
         _VAR(final_speed);
         _VAR(coeff);
-    */
+      */
     }
     
     void set_transition (int current_speed_, int final_speed_, 
@@ -168,10 +168,6 @@ private:
     {
         if (speed > 0) {
             analogWrite (pin1, (int)(motor_ratio * speed));
-
-            VAR_(motor_ratio);
-            VAR_(speed);
-            VAR_((int)(motor_ratio * speed));
             analogWrite (pin2, 0);
             return speed;
         } else {

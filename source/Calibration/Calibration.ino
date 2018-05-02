@@ -13,7 +13,7 @@
 
 #define   SENSOR_PIN A7
 
-#define STABILIZATION_TIME 30
+#define STABILIZATION_TIME 20
 
 #include "regression2.h"
 #include "csensor.h"
@@ -41,7 +41,7 @@ void calibrate ()
   static calibration_data c [NSEEDS]; 
   double Ys[2][NSEEDS];
   
-  attachInterrupt(digitalPinToInterrupt(CALIBRATION_PIN), nothing, RISING);
+  attachInterrupt(digitalPinToInterrupt(CALIBRATION_PIN), nothing, FALLING);
   interrupts();
    if (millis() - LastPress > debounce_delay) {
       LastPress = millis();
@@ -74,7 +74,7 @@ void calibrate ()
       }
       // RUN TEST ----------------------------------
    }
-   attachInterrupt(digitalPinToInterrupt(CALIBRATION_PIN), calibrate, RISING); 
+   attachInterrupt(digitalPinToInterrupt(CALIBRATION_PIN), calibrate, FALLING); 
 }
 
 void setup() {
@@ -92,7 +92,7 @@ void setup() {
     pinMode(    RED_LED_PIN, OUTPUT);
     pinMode(     SENSOR_PIN, INPUT);
     
-    attachInterrupt(digitalPinToInterrupt(CALIBRATION_PIN), calibrate, RISING);
+    attachInterrupt(digitalPinToInterrupt(CALIBRATION_PIN), calibrate, FALLING);
     interrupts();
 }
 
@@ -218,39 +218,6 @@ void color_print (color c)
     }
 }
 
-
-/*
-// #define NSEEDS 28
-calibration_data c[NSEEDS] = 
-{{BLUE,98,16,320,396},
- {RED,425,44,117,492},
- {YELLOW,524,78,278,701},
- {BLACK,64,7,55,112},
- {BLUE,108,14,366,466},
- {RED,434,45,119,502},
- {YELLOW,599,92,325,778},
- {BLACK,66,6,64,128},
- {BLUE,149,47,387,485},
- {RED,417,72,137,477},
- {YELLOW,624,198,388,755},
- {BLACK,76,23,70,122},
- {BLUE,142,28,403,513},
- {RED,531,63,154,604},
- {YELLOW,338,161,188,363},
- {BLACK,65,12,56,112},
- {BLUE,102,29,103,186},
- {RED,468,60,124,524},
- {YELLOW,593,211,380,728},
- {BLACK,71,18,64,119},
- {BLUE,138,14,556,675},
- {RED,254,63,103,275},
- {YELLOW,472,86,143,524},
- {BLACK,72,66,93,155},
- {BLUE,131,25,375,478},
- {RED,365,72,127,426},
- {YELLOW,545,216,362,664},
- {BLACK,71,18,13,109}};
-*/
 
 
 color choose_color (int choose) 
