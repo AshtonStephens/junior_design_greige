@@ -15,7 +15,7 @@
 
 // MAKE MORE PROMINENT
 typedef float Betas[NPARAMS+1];
-//#define DEBUG_CSENSOR_COLORS
+#define DEBUG_CSENSOR_COLORS
 //#define DEBUG_CSENSOR_RAW
 
 class csensor 

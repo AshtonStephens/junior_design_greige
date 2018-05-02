@@ -56,6 +56,11 @@ bool blackblack ()
   return (Bot.sensors.left() == BLACK) && (Bot.sensors.right() == BLACK);
 }
 
+bool redred ()
+{
+  return (Bot.sensors.left() == RED) && (Bot.sensors.right() == RED);
+}
+
 bool hall (){return Bot.hall_interrupt;}
 bool collision (){return Bot.collision_interrupt;}
 
@@ -131,6 +136,7 @@ struct tracktrack_data
   int  lt;          // lowthrottle
   int  slope;       // duration of motor change
   int  NS ;         // next state
+  color forgive;
   /* ---- TEMPS ---- */
   int  last_state;  // 
 };
@@ -154,7 +160,7 @@ flashled_data   c1b1_initflash          = {RED_STATE_LED_FLASH|BLUE_STATE_LED_FL
 talk_data       c1b1_start_talk         = {500, 5};                                            // state 4 -> 5
 flashled_data   c1b1_startflash         = {GREEN_STATE_LED_FLASH, 3, 6};                       // state 5 -> 6
 move_if_data    c1b1_initial_collision1 = {100, collision,   100, 100, 8};                     // state 6 -> 8
-move_time_data  c1b1_initial_collision2 = {100, 750, -75, -100, 10};                           // state 8 -> 10
+move_time_data  c1b1_initial_collision2 = {100, 750, -70, -105, 10};                             // state 8 -> 10
 move_if_data    c1b1_initial_collision3 = {1000, blueblue, 80, 70, 13};                        // state 10 -> 13
 tracktrack_data c1b1_track_blue         = {BLUE, BLUE,  yellowyellow,  70,  0, -40, 750, 14};  // state 13 -> 14
 move_time_data  c1b1_forward_smidge1    = {100, 200,   70,   70, 15};;                         // state 14 -> 15
@@ -183,7 +189,7 @@ move_time_data  c1b1_back_from_redwall  = {100, 1000, 0, 0, 55};                
 
 move_time_data  c1b1_turn_90_to_bot     = {100, 350,  -150,  50, 57};                          // state 55 -> 57
 move_time_data  c1b1_turn_135_to_tcc    = {100, 500,  -150,  50, 58};                          // state 57 -> 58
-talk_data       c1b1_start_talk_tcc     = {300, 59};                                           // state 58 -> 59 (300 ms)  // message 2
+talk_data       c1b1_start_talk_tcc2    = {330, 59};                                           // state 58 -> 59 (300 ms)  // message 2
 
 move_time_data  c1b1_turn_135_to_bot    = {100, 500,  50,  -150, 60};                          // state 59 -> 60
 
@@ -198,6 +204,51 @@ listen_data     c1b1_listen_bot2_finish = {500, 300, 200, 50, 66, BLUE_STATE_LED
 move_if_data    c1b1_final_collision    = {100, collision,   100, 100, 68};                    // state 66 -> 68
 flashled_data   c1b1_final_flash        = {HEADLIGHT_LED_FLASH | BREAKLIGHT_LED_FLASH |
                                            LTURN_LED_FLASH     | RTURN_LED_FLASH, 10, 69};     // state 68 -> 69
+
+										   
+/* --------------------------------------------------- *
+ |  bot 2 challenge 1                                  |
+ * --------------------------------------------------- */
+listen_data		  c1b2_init_listen		    = {300, 300, 200, 50, 2, BLUE_STATE_LED_FLASH};        // state 1 -> 2
+flashled_data   c1b2_initflash          = {RED_STATE_LED_FLASH|BLUE_STATE_LED_FLASH, 3, 4};    // state 2 -> 4
+talk_data       c1b2_start_talk         = {500, 5};                                            // state 4 -> 5
+flashled_data   c1b2_startflash         = {GREEN_STATE_LED_FLASH, 3, 6};                       // state 5 -> 6
+move_if_data    c1b2_initial_collision1 = {100, collision,   100, 100, 8};                     // state 6 -> 8
+move_time_data  c1b2_initial_collision2 = {100, 750, -100, -75, 10};                           // state 8 -> 10
+move_if_data    c1b2_initial_collision3 = {1000, redred, 70, 80, 13};                          // state 10 -> 13
+tracktrack_data c1b2_track_red          = {RED, RED,  yellowyellow,  70,  0, -40, 750, 14};    // state 13 -> 14 ***
+move_time_data  c1b2_forward_smidge1    = {100, 200,   70,   70, 15};;                         // state 14 -> 15
+move_time_data  c1b2_left_90            = {100, 340,  -70,  70, 20};                           // state 15 -> 20
+tracktrack_data c1b2_track_yellow       = {YELLOW, YELLOW, blackblack,  70, 0, -40, 750, 25};  // state 20 -> 25 ***
+move_time_data  c1b2_right_90           = {100, 350,  50,  -150, 27};                          // state 25 -> 27
+move_time_data  c1b2_forward_jolt       = {100, 200,  100,  100, 30};                          // state 27 -> 30 
+tracktrack_data c1b2_track_blue         = {BLUE, BLUE, hall,  70, 0, -40, 750, 35, YELLOW};            // state 30 -> 35 ***
+/*                                                     *
+ |  bot 2 after detecting hall sensor                  |
+ * --------------------------------------------------- */
+move_time_data  c1b2_stop_hall_jolt1    = {100, 350,  0,  0,  36};                         // state 35 -> 36
+move_time_data  c1b2_turn_tcc_jolt      = {100, 350,  0,  -150, 38};                             // state 36 -> 38 // angle to TCC
+
+// TODO: ensure that this is the right timing 
+flashled_data   c1b2_tcc200ms_flash     = {GREEN_STATE_LED_FLASH, 3, 40};                      // state 38 -> 40 
+talk_data       c1b2_start_talk_tcc     = {400, 43};                                           // state 40 -> 43 (400 ms) // message 3
+
+// TODO: ensure that this is the right timing make sure this is the right threshold
+listen_data     c1b2_start_listen_tcc   = {400, 300, 200, 50, 45, BLUE_STATE_LED_FLASH};       // state 43 -> 45 (RCV 400 ms) // message 3
+ 
+move_time_data  c1b2_turn_tcc_jolt2     = {100, 350,  -150,  0, 48};                           // state 45 -> 48 // angle back to road
+tracktrack_data c1b2_track_blue_to_wall = {BLUE, BLUE, collision,  70, 0, -40, 750, 50, YELLOW};      // state 48 -> 50
+flashled_data   c1b2_bluewall_flash     = {BLUE_STATE_LED_FLASH, 3, 53};                      // state 50 -> 53
+move_time_data  c1b2_back_from_bluewall = {100, 1000, 0, 0, 55};                              // state 53 -> 55
+
+move_time_data  c1b2_turn_90_to_bot     = {100, 350,  50,  -150, 58};                          // state 55 -> 58
+talk_data       c1b2_talk_to_bot1    	= {500, 60};                                           // state 58 -> 60 (500 ms)  // tell bot 1 to start again
+/*                                                     *
+ |  bots start to move until collision                          |
+ * --------------------------------------------------- */
+move_if_data    c1b2_final_collision    = {100, collision,   100, 100, 65};                    // state 60 -> 65
+flashled_data   c1b2_final_flash        = {HEADLIGHT_LED_FLASH | BREAKLIGHT_LED_FLASH |
+                                           LTURN_LED_FLASH     | RTURN_LED_FLASH, 10, 69};     // state 65 -> 69
 
 
 
@@ -314,21 +365,21 @@ int tracktrack (bool firstrun, void *v)
   // IF THE left IS ON THE TRACK COLOR +> MAKE SURE THE LEFT IS GOING SLOW 
   //                                   +> MAKE SURE THE RIGHT IS GOING FAST
    Bot.show_following_path(ttd->L);
-   if (Bot.sensors.left() == ttd->L && Bot.sensors.right() == ttd->R) { 
+   if ((Bot.sensors.left() == ttd->L || Bot.sensors.left() == ttd->forgive)&& Bot.sensors.right() == ttd->R) { 
       Serial.println("go forward");
       ttd->last_state = 0;
       // IF IM CORRECTLY ON THE TRACK THEN GO FORWARD
       Bot.lmotor.set_transition(CURRENT_SPEED, ttd->ft, ttd->slope, LINEAR_SLOPE);
       Bot.rmotor.set_transition(CURRENT_SPEED, ttd->ft, ttd->slope, LINEAR_SLOPE);
-  } else if ( (Bot.sensors.right() != ttd->R && Bot.sensors.left() == ttd->L) ||
-              ((Bot.sensors.right() != ttd->R  && Bot.sensors.left() != ttd->L) && (ttd->last_state == 1))) {
+  } else if (  ((Bot.sensors.right() != ttd->R && Bot.sensors.right() != ttd->forgive ) && (Bot.sensors.left() == ttd->L || Bot.sensors.left() == ttd->forgive)) ||
+              (((Bot.sensors.right() != ttd->R && Bot.sensors.right() != ttd->forgive ) && (Bot.sensors.left() != ttd->L && Bot.sensors.left() != ttd->forgive)) && (ttd->last_state == 1))) {
       Serial.println("adjust left");
       ttd->last_state = 1;
       // ADJUST LEFT
       Bot.rmotor.set_transition(CURRENT_SPEED, ttd->mt, ttd->slope, LINEAR_SLOPE);
       Bot.lmotor.set_transition(CURRENT_SPEED, ttd->lt, ttd->slope, LINEAR_SLOPE);
-  } else if ( (Bot.sensors.left() != ttd->L && Bot.sensors.right() == ttd->R) || 
-              ((Bot.sensors.right() != ttd->R && Bot.sensors.left() != ttd->L) && (ttd->last_state == 2))) {
+  } else if ( ( (Bot.sensors.left()   != ttd->L && Bot.sensors.left()  != ttd->forgive) && (Bot.sensors.right() == ttd->R || Bot.sensors.right() == ttd->forgive) ) || 
+              ( ((Bot.sensors.right() != ttd->R && Bot.sensors.right() != ttd->forgive) && (Bot.sensors.left()  != ttd->L && Bot.sensors.left()  != ttd->forgive)) && (ttd->last_state == 2))) {
       ttd->last_state = 2;
       Serial.println("adjust right");
       // ADJUST RIGHT

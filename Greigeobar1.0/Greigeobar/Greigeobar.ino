@@ -1,5 +1,5 @@
 
-#define ZINNOBAR
+#define GREIGE
 
 #include "smart_bot.h"
 #include "states.h"
@@ -12,7 +12,10 @@
 #define L_TURNSIGNAL 0
 #define R_TURNSIGNAL 1
 #define BREAKLIGHTS  49
-#define HEADLIGHTS   25
+#define HEADLIGHTS   53
+
+#define HEADLIGHTS_SENSE_L A13
+#define HEADLIGHTS_SENSE_R A14
 
 // state lights -------- //
 #define LED_STATE_BLUE   14 
@@ -36,11 +39,6 @@
 #define RED_LED        39 //
 #define BLUE_LED       37 //
 
-// communicaton ----- // 
-#define RECEIVING A14 //
-#define SENDING   38  //
-
-
 #define PIN1_M1 6  //
 #define PIN2_M1 7  //
 #define PIN1_M2 5  //
@@ -57,6 +55,10 @@ bool ROUTINE_STARTED = false;
 void startup_script();
 
 #ifdef ZINNOBAR
+// communicaton ----- // 
+#define RECEIVING A15 //
+#define SENDING   38  //
+
 #define MOTORR_RATIO 0.9
 #define MOTORL_RATIO 0.9
 const float redBsl[NPARAMS+1] = {-5.328314, -13.148070, 23.613085};
@@ -66,12 +68,16 @@ const float bluBsr[NPARAMS+1] = {-9.143999, 19.150152, -2.333729};
 #endif
     
 #ifdef GREIGE
+// communicaton ----- // 
+#define RECEIVING A5 //
+#define SENDING   38  //
+
 #define MOTORR_RATIO 0.9
 #define MOTORL_RATIO 0.9
- 
 
-const float redBsr[NPARAMS+1] =  {-4.778298, -15.261315, 27.312647};
-const float bluBsr[NPARAMS+1] = {-10.186932, 22.284243, -4.507212};
+const float redBsr[NPARAMS+1] = {-14.674660, 1.128543, 21.177556};
+const float bluBsr[NPARAMS+1] = {-7.286187, 34.452386, -22.572911};
+
 const float redBsl[NPARAMS+1] = {-5.795165, -13.741407, 25.120166};
 const float bluBsl[NPARAMS+1] = {-4.256994, 25.752916, -18.000910};
 #endif
