@@ -157,14 +157,15 @@ struct tracktrack_data
  |  bot 1 challenge 1                                  |
  * --------------------------------------------------- */
 flashled_data   c1b1_initflash          = {RED_STATE_LED_FLASH|BLUE_STATE_LED_FLASH, 3, 4};    // state 1 -> 4
-talk_data       c1b1_start_talk         = {500, 5};                                            // state 4 -> 5
+talk_data       c1b1_start_talk         = {600, 5};                                            // state 4 -> 5
 flashled_data   c1b1_startflash         = {GREEN_STATE_LED_FLASH, 3, 6};                       // state 5 -> 6
 move_if_data    c1b1_initial_collision1 = {100, collision,   100, 100, 8};                     // state 6 -> 8
-move_time_data  c1b1_initial_collision2 = {100, 750, -70, -105, 10};                             // state 8 -> 10
-move_if_data    c1b1_initial_collision3 = {1000, blueblue, 80, 70, 13};                        // state 10 -> 13
+move_time_data  c1b1_initial_collision2 = {100,550, -70, -105, 10};                             // state 8 -> 10
+move_time_data  c1b1_init_col_wait      = {100, 200,    0,    0, 12}; //*** brief pause           state 10 -> 12
+move_if_data    c1b1_initial_collision3 = {1000, blueblue, 80, 70, 13};                        // state 12 -> 13
 tracktrack_data c1b1_track_blue         = {BLUE, BLUE,  yellowyellow,  70,  0, -40, 750, 14};  // state 13 -> 14
 move_time_data  c1b1_forward_smidge1    = {100, 200,   70,   70, 15};;                         // state 14 -> 15
-move_time_data  c1b1_right_90           = {100, 340,  70,  -70, 20};                           // state 15 -> 20
+move_time_data  c1b1_right_90           = {100, 350,  70,  -70, 20};                           // state 15 -> 20
 tracktrack_data c1b1_track_yellow       = {YELLOW, YELLOW, blackblack,  70, 0, -40, 750, 25};  // state 20 -> 25
 move_time_data  c1b1_left_90            = {100, 350,  -150,  50, 27};                          // state 25 -> 27
 move_time_data  c1b1_forward_jolt       = {100, 200,  100,  100, 30};                          // state 27 -> 30 
@@ -177,10 +178,10 @@ move_time_data  c1b1_turn_tcc_jolt      = {100, 700, 0, -130, 38};              
 
 // TODO: ensure that this is the right timing 
 flashled_data   c1b1_tcc200ms_flash     = {GREEN_STATE_LED_FLASH, 3, 40};                      // state 38 -> 40 
-talk_data       c1b1_start_talk_tcc     = {200, 43};                                           // state 40 -> 43 (200 ms?) // message 1
+talk_data       c1b1_start_talk_tcc     = {210, 43};                                           // state 40 -> 43 (200 ms?) // message 1
 
 // TODO: ensure that this is the right timing make sure this is the right threshold
-listen_data     c1b1_start_tisten_tcc   = {200, 300, 200, 50, 45, BLUE_STATE_LED_FLASH};       // state 43 -> 45 (200 ms?) // message 1
+listen_data     c1b1_start_tisten_tcc   = {215, 300, 100, 40, 45, BLUE_STATE_LED_FLASH};       // state 43 -> 45 (200 ms?) // message 1
 
 move_time_data  c1b1_turn_tcc_jolt2     = {100, 700, 0, 130, 48};                              // state 45 -> 48 // angle back to road
 tracktrack_data c1b1_track_red_to_wall  = {RED, RED, collision,  70, 0, -40, 750, 50};         // state 48 -> 50
@@ -188,20 +189,22 @@ flashled_data   c1b1_redwall_flash      = {RED_STATE_LED_FLASH, 3, 53};         
 move_time_data  c1b1_back_from_redwall  = {100, 1000, 0, 0, 55};                               // state 53 -> 55
 
 move_time_data  c1b1_turn_90_to_bot     = {100, 350,  -150,  50, 57};                          // state 55 -> 57
-move_time_data  c1b1_turn_135_to_tcc    = {100, 500,  -150,  50, 58};                          // state 57 -> 58
-talk_data       c1b1_start_talk_tcc2    = {330, 59};                                           // state 58 -> 59 (300 ms)  // message 2
+move_time_data  c1b1_turn_135_to_tcc    = {100, 450,  -150,  50, 70};                          // state 57 -> 70**
+move_time_data  c1b1_pause_tcc          = {100, 200,    0,    0, 58}; //*** brief pause           state 70 ->58
+talk_data       c1b1_start_talk_tcc2    = {330, 71};                                           // state 58 -> 71 (300 ms)  // message 2
+move_time_data  c1b1_pause_after_tcc    = {100, 200,    0,    0, 59}; //*** brief pause           state 71 -> 59
 
-move_time_data  c1b1_turn_135_to_bot    = {100, 500,  50,  -150, 60};                          // state 59 -> 60
+move_time_data  c1b1_turn_135_to_bot    = {100, 450,  50,  -150, 60};                          // state 59 -> 60
 
 /*                                                     *
  |  bot 2 starts its test                              |
  * --------------------------------------------------- */
 
-listen_data     c1b1_listen_bot2_start  = {500, 300, 200, 50, 62, BLUE_STATE_LED_FLASH};       // state 60 -> 62 (RCV 500 ms) // bot 2 START message
+listen_data     c1b1_listen_bot2_start  = {615, 250, 90, 40, 62, BLUE_STATE_LED_FLASH};       // state 60 -> 62 (RCV 500 ms) // bot 2 START message
 flashled_data   c1b1_receive_startflash = {GREEN_STATE_LED_FLASH, 3, 64};                      // state 62-> 64 
 
-listen_data     c1b1_listen_bot2_finish = {500, 300, 200, 50, 66, BLUE_STATE_LED_FLASH};       // state 64 -> 66 (RCV 500 ms) // bot 2 FINISH message
-move_if_data    c1b1_final_collision    = {100, collision,   100, 100, 68};                    // state 66 -> 68
+listen_data     c1b1_listen_bot2_finish = {615, 210, 70, 40, 66, BLUE_STATE_LED_FLASH};       // state 64 -> 66 (RCV 500 ms) // bot 2 FINISH message
+move_if_data    c1b1_final_collision    = {100, collision,   80, 80, 68};                    // state 66 -> 68
 flashled_data   c1b1_final_flash        = {HEADLIGHT_LED_FLASH | BREAKLIGHT_LED_FLASH |
                                            LTURN_LED_FLASH     | RTURN_LED_FLASH, 10, 69};     // state 68 -> 69
 
@@ -209,13 +212,14 @@ flashled_data   c1b1_final_flash        = {HEADLIGHT_LED_FLASH | BREAKLIGHT_LED_
 /* --------------------------------------------------- *
  |  bot 2 challenge 1                                  |
  * --------------------------------------------------- */
-listen_data		  c1b2_init_listen		    = {300, 300, 200, 50, 2, BLUE_STATE_LED_FLASH};        // state 1 -> 2
-flashled_data   c1b2_initflash          = {RED_STATE_LED_FLASH|BLUE_STATE_LED_FLASH, 3, 4};    // state 2 -> 4
-talk_data       c1b2_start_talk         = {500, 5};                                            // state 4 -> 5
+listen_data		  c1b2_init_listen		    = {315, 250, 100, 50, 2, BLUE_STATE_LED_FLASH};        // state 1 -> 2
+flashled_data   c1b2_initflash          = {RED_STATE_LED_FLASH|BLUE_STATE_LED_FLASH, 3, 5};    // state 2 -> 4
+talk_data       c1b2_start_talk         = {600, 5};                                            // state 4 -> 5
 flashled_data   c1b2_startflash         = {GREEN_STATE_LED_FLASH, 3, 6};                       // state 5 -> 6
 move_if_data    c1b2_initial_collision1 = {100, collision,   100, 100, 8};                     // state 6 -> 8
-move_time_data  c1b2_initial_collision2 = {100, 750, -100, -75, 10};                           // state 8 -> 10
-move_if_data    c1b2_initial_collision3 = {1000, redred, 70, 80, 13};                          // state 10 -> 13
+move_time_data  c1b2_initial_collision2 = {100, 500, -100, -75, 10};                           // state 8 -> 10
+move_time_data  c1b2_init_col_wait      = {100, 200,    0,    0, 12}; //*** brief pause           state 10 -> 12
+move_if_data    c1b2_initial_collision3 = {1000, redred, 70, 80, 13};                          // state 12 -> 13
 tracktrack_data c1b2_track_red          = {RED, RED,  yellowyellow,  70,  0, -40, 750, 14};    // state 13 -> 14 ***
 move_time_data  c1b2_forward_smidge1    = {100, 200,   70,   70, 15};;                         // state 14 -> 15
 move_time_data  c1b2_left_90            = {100, 340,  -70,  70, 20};                           // state 15 -> 20
@@ -227,29 +231,45 @@ tracktrack_data c1b2_track_blue         = {BLUE, BLUE, hall,  70, 0, -40, 750, 3
  |  bot 2 after detecting hall sensor                  |
  * --------------------------------------------------- */
 move_time_data  c1b2_stop_hall_jolt1    = {100, 350,  0,  0,  36};                         // state 35 -> 36
-move_time_data  c1b2_turn_tcc_jolt      = {100, 350,  0,  -150, 38};                             // state 36 -> 38 // angle to TCC
+move_time_data  c1b2_turn_tcc_jolt      = {100, 460,  0,  -150, 38};                             // state 36 -> 38 // angle to TCC
 
-// TODO: ensure that this is the right timing 
+// DID: SENDING TWO PULSES TO DOUBLE OUR CHANCES
 flashled_data   c1b2_tcc200ms_flash     = {GREEN_STATE_LED_FLASH, 3, 40};                      // state 38 -> 40 
-talk_data       c1b2_start_talk_tcc     = {400, 43};                                           // state 40 -> 43 (400 ms) // message 3
+talk_data       c1b2_start_talk_tcc     = {430, 41};                                           // state 40 -> 41 (400 ms) // message 3
+move_time_data  c1b2_pause_tcc          = {100, 200, 0, 0, 42};                                // state 41 -> 42
+talk_data       c1b2_start_talk_tcc2    = {430, 43};                                           // state 42 -> 43 (400 ms) // message 3
+
 
 // TODO: ensure that this is the right timing make sure this is the right threshold
-listen_data     c1b2_start_listen_tcc   = {400, 300, 200, 50, 45, BLUE_STATE_LED_FLASH};       // state 43 -> 45 (RCV 400 ms) // message 3
+listen_data     c1b2_start_listen_tcc   = {415, 300, 100, 40, 45, BLUE_STATE_LED_FLASH};       // state 43 -> 45 (RCV 400 ms) // message 3
  
-move_time_data  c1b2_turn_tcc_jolt2     = {100, 350,  -150,  0, 48};                           // state 45 -> 48 // angle back to road
+move_time_data  c1b2_turn_tcc_jolt2     = {100, 460,  0,  150, 48};                           // state 45 -> 48 // angle back to road
 tracktrack_data c1b2_track_blue_to_wall = {BLUE, BLUE, collision,  70, 0, -40, 750, 50, YELLOW};      // state 48 -> 50
 flashled_data   c1b2_bluewall_flash     = {BLUE_STATE_LED_FLASH, 3, 53};                      // state 50 -> 53
 move_time_data  c1b2_back_from_bluewall = {100, 1000, 0, 0, 55};                              // state 53 -> 55
 
-move_time_data  c1b2_turn_90_to_bot     = {100, 350,  50,  -150, 58};                          // state 55 -> 58
-talk_data       c1b2_talk_to_bot1    	= {500, 60};                                           // state 58 -> 60 (500 ms)  // tell bot 1 to start again
+move_time_data  c1b2_turn_90_to_bot     = {100, 300,  50,  -150, 58};                         // state 55 -> 58
+move_time_data  c1b2_pause_before_bot1  = {100, 500,    0,    0, 59};                         // state 58 -> 59
+talk_data       c1b2_talk_to_bot1    	  = {600, 80};                                          // state 59 -> 80 (500 ms)  // tell bot 1 to start again
+move_time_data  c1b2_pause2_before_bot1  = {100, 2000,    0,    0, 85};                         // state 80 -> 85
+talk_data       c1b2_talk2_to_bot1       = {600, 60};                                          // state 85 -> 60 (500 ms)  // tell bot 1 to start (#2)
+
 /*                                                     *
  |  bots start to move until collision                          |
  * --------------------------------------------------- */
-move_if_data    c1b2_final_collision    = {100, collision,   100, 100, 65};                    // state 60 -> 65
+move_if_data    c1b2_final_collision    = {100, collision,   80, 80, 65};                    // state 60 -> 65
 flashled_data   c1b2_final_flash        = {HEADLIGHT_LED_FLASH | BREAKLIGHT_LED_FLASH |
                                            LTURN_LED_FLASH     | RTURN_LED_FLASH, 10, 69};     // state 65 -> 69
 
+
+/* COMMS_TEST 
+    {THREAD_3, 1, {talk,    &testComms_talk_400}},        // state: 1 -> 5
+    {THREAD_3, 5, {move_time, &testComms_pause}},         // state: 5 -> 10 
+    {THREAD_3, 10, {move_time, &testComms_talk_400_2}},         // state: 10 -> 69 
+*/
+talk_data       testComms_talk_400      = {600, 5};
+move_time_data  testComms_pause         = {100, 200, 0, 0, 10};
+talk_data       testComms_talk_400_2    = {600, 69};
 
 
 /* BOT 1 Challenge 1 ----------------------------- */

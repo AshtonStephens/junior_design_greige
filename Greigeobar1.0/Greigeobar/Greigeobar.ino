@@ -1,12 +1,13 @@
 
-#define GREIGE
+//#define GREIGE
+#define ZINNOBAR
 
 #include "smart_bot.h"
 #include "states.h"
 #include "smart_motor.h"
 
-#define POT_A  A14
-#define POT_B  A15
+//#define POT_A  A14
+//#define POT_B  A15
 
 // cool lights ----- //
 #define L_TURNSIGNAL 0
@@ -58,26 +59,22 @@ void startup_script();
 // communicaton ----- // 
 #define RECEIVING A15 //
 #define SENDING   38  //
-
 #define MOTORR_RATIO 0.9
 #define MOTORL_RATIO 0.9
-const float redBsl[NPARAMS+1] = {-5.328314, -13.148070, 23.613085};
-const float bluBsl[NPARAMS+1] = {-10.223347, 18.549933, -0.996931};
-const float redBsr[NPARAMS+1] = {-4.765302, -12.646533, 22.950511};
-const float bluBsr[NPARAMS+1] = {-9.143999, 19.150152, -2.333729};
+const float redBsl[NPARAMS+1] = {-6.068814, -18.489579, 29.352758};
+const float bluBsl[NPARAMS+1] = {-12.743714, 22.864221, -3.947755};
+const float redBsr[NPARAMS+1] = {-3.680531, -16.105715, 22.564435};
+const float bluBsr[NPARAMS+1] =  {-10.350145, 24.930389, -8.754170};
 #endif
     
 #ifdef GREIGE
 // communicaton ----- // 
 #define RECEIVING A5 //
 #define SENDING   38  //
-
 #define MOTORR_RATIO 0.9
 #define MOTORL_RATIO 0.9
-
 const float redBsr[NPARAMS+1] = {-14.674660, 1.128543, 21.177556};
 const float bluBsr[NPARAMS+1] = {-7.286187, 34.452386, -22.572911};
-
 const float redBsl[NPARAMS+1] = {-5.795165, -13.741407, 25.120166};
 const float bluBsl[NPARAMS+1] = {-4.256994, 25.752916, -18.000910};
 #endif
@@ -113,8 +110,8 @@ void setup ()
     while (!Serial)  {}
     Serial.print("printing ready\n");
 
-    pinMode (POT_A, INPUT);
-    pinMode (POT_B, INPUT);
+    //pinMode (POT_A, INPUT);
+    //pinMode (POT_B, INPUT);
   
 // cool lights ---------
     pinMode( L_TURNSIGNAL, OUTPUT);
