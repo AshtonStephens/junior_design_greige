@@ -10,13 +10,8 @@
 //#define POT_B  A15
 
 // cool lights ----- //
-#define L_TURNSIGNAL 0
-#define R_TURNSIGNAL 1
 #define BREAKLIGHTS  49
 #define HEADLIGHTS   53
-
-#define HEADLIGHTS_SENSE_L A13
-#define HEADLIGHTS_SENSE_R A14
 
 // state lights -------- //
 #define LED_STATE_BLUE   14 
@@ -57,6 +52,8 @@ void startup_script();
 
 #ifdef ZINNOBAR
 // communicaton ----- // 
+#define L_TURNSIGNAL 9
+#define R_TURNSIGNAL 8
 #define RECEIVING A15 //
 #define SENDING   38  //
 #define MOTORR_RATIO 0.9
@@ -69,8 +66,10 @@ const float bluBsr[NPARAMS+1] =  {-10.350145, 24.930389, -8.754170};
     
 #ifdef GREIGE
 // communicaton ----- // 
-#define RECEIVING A5 //
-#define SENDING   38  //
+#define L_TURNSIGNAL 9    //
+#define R_TURNSIGNAL 8    //
+#define RECEIVING A5      //
+#define SENDING   38      //
 #define MOTORR_RATIO 0.9
 #define MOTORL_RATIO 0.9
 const float redBsr[NPARAMS+1] = {-14.674660, 1.128543, 21.177556};
@@ -178,7 +177,18 @@ void loop ()
     startup_script();
      
     long long timer = millis ();
-    while (!ROUTINE_STARTED) { Bot.sensors.sense();} 
+    int left_headlight;
+    int right_headlight;
+    
+    while (!ROUTINE_STARTED) { 
+      Bot.sensors.sense();
+      left_headlight  = analogRead(HEADLIGHTS_SENSE_L);
+      right_headlight = analogRead(HEADLIGHTS_SENSE_R);
+      VAR_(left_headlight);
+      Serial.print(" | ");
+      VAR_ln(right_headlight);
+    } 
+
 
     // attach the normal interrupt
     attachInterrupt(digitalPinToInterrupt(COLLISION), collision_detect, FALLING);

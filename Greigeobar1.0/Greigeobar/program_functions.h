@@ -27,6 +27,9 @@
 #define IS_ADJUST_LEFT  3
 #define XX 69
 
+#define DEBUG_COMMS
+    
+
 bool yellowblack () 
 { //Serial.print("adjusting");
   return (Bot.sensors.left() == YELLOW) && ((Bot.sensors.right() == BLACK) ||(Bot.sensors.right() == RED));
@@ -64,14 +67,16 @@ bool redred ()
 bool hall (){return Bot.hall_interrupt;}
 bool collision (){return Bot.collision_interrupt;}
 
-/* --------------------------------------------------------------- CHALLENGE 2/3
-static const int light_threshold = 200;
+// --------------------------------------------------------------- CHALLENGE 2/3
+static const int light_threshold = 800;
+#define HEADLIGHTS_SENSE_L A13
+#define HEADLIGHTS_SENSE_R A14
 
 bool headlights_sensed()
 {
-	return analogRead(HEADLIGHT_SENSOR) > light_threshold); 
+  return ((analogRead(HEADLIGHTS_SENSE_L) < light_threshold) || (analogRead(HEADLIGHTS_SENSE_R) < light_threshold)); 
 }
-   ---------------------------------------------------------------  CHALLENGE 2/3 */
+// ---------------------------------------------------------------  CHALLENGE 2/3
 
 struct talk_data 
 {
@@ -152,6 +157,9 @@ struct tracktrack_data
     bool high;
     long long start_time;
 };*/
+
+//move_time_data       c2b1_fwd_12in        = {100, INCH_TRAVEL*12, FWD_TRAVEL_SPD, FWD_TRAVEL_SPD,   0, 10};
+//move_time_data  c1b1_initial_collision2 = {100,550, -70, -105, 10};                             // state 8 -> 10
 
 /* --------------------------------------------------- *
  |  bot 1 challenge 1                                  |
@@ -442,6 +450,8 @@ int move_time (bool firstrun, void *v)
     // TURN ON LEFT TURN SIGNAL IF RIGHT MOTOR IS GOING FASTER THAN THE LEFT
     // TURN ON RIGHT TURN SIGNAL IF LEFT MOTOR IS GOING FASTER THAN THE RIGHT
     // TURN ON BREAK LIGHTS IF BOTH ARE SLOWING DOWN AND NOT TURNING
+    // TURN ON HEADLIGHTS
+    Bot.leds.headlights.on_solid();
     
     if (firstrun) {
         Bot.lmotor.set_transition(CURRENT_SPEED, md->Lmotor_speed, md->ramp_time, LINEAR_DURATION);
@@ -464,6 +474,9 @@ int move_time (bool firstrun, void *v)
 int move_if (bool firstrun, void *v) 
 {
     move_if_data *md = (move_if_data*)v;
+
+    // TURN ON HEADLIGHTS
+    Bot.leds.headlights.on_solid();
    
     if (firstrun) {
         Bot.enable_hall_interrupt ();
@@ -530,6 +543,7 @@ int talk (bool firstrun, void *v)
     Bot.disable_hall_interrupt();
     Bot.disable_collision_interrupt();
     
+    
     if (firstrun) {
         Bot.sending_on();
         Bot.lmotor.set_transition(CURRENT_SPEED, 0, 100, LINEAR_DURATION);
@@ -563,11 +577,33 @@ struct listen_data
 
 */
 
+/*
+int RC_mode(bool firstrun, void *v)
+{
+  (void) firstrun; (void) v;
+  Bot.lmotor.set_transition(CURRENT_SPEED, , 100, LINER_SLOPE);
+  Bot.rmotor.set_transition(CURRENT_SPEED, , 100, LINEAR_SLOPE);
+} 
+*/
+
 int listen (bool firstrun, void *v) 
 {
     listen_data *ld = (listen_data *)v;
     int input_signal = Bot.receive();
-    int signal_time;
+
+    // TURN ON HEADLIGHTS
+    Bot.leds.headlights.on_solid();
+
+    // DEBUG CODE -----
+    #ifdef DEBUG_COMMS
+    if (!(ld-> high)) {
+        VAR_((int)input_signal); 
+        VAR_ln((int)(ld-> start_time));
+    } else {
+       VAR_ln((int)input_signal);
+    }
+    #endif
+    // DEBUG CODE -----
 
     if (firstrun) {       
         Bot.lmotor.set_transition(CURRENT_SPEED, 0, 100, LINEAR_DURATION);
@@ -580,9 +616,9 @@ int listen (bool firstrun, void *v)
         ld-> start_time = millis(); 
     } else if ((ld->high) && ((input_signal) < (ld->falling_edge))) {
         ld-> high = false;
-        signal_time = millis() - (ld-> start_time);
-        if ( ((ld->duration + ld->time_deviation) > signal_time) 
-          && (signal_time > (ld->duration - ld->time_deviation))) {
+        ld-> start_time = millis() - (ld-> start_time);
+        if ( ((ld->duration + ld->time_deviation) > ld-> start_time) 
+          && (ld-> start_time > (ld->duration - ld->time_deviation))) {
             return ld-> NS;
         }
     }
@@ -602,56 +638,81 @@ int listen (bool firstrun, void *v)
     
     return 0;
 }
+
+
 /*
+struct listen_data 
+{
+    int  duration;
+    int  rising_edge;
+    int  falling_edge;
+    int  time_deviation;
+    int NS; 
+    int reception_leds;
+    // ---- TEMPS ---- 
+    bool high;
+    long long start_time;
+};
+*/
+
+
 // BOT 1 Challenge 2 ----------------------------- 
-static const int FWD_TRAVEL_SPD = 200;
-static const int INCH_TRAVEL 	= 150;
+static const int FWD_TRAVEL_SPD   = 60;
+static const int INCH_TRAVEL 	    = 80;
 static const int TURN_WHEEL_SPD 	= -100;
 static const int OPP_WHEEL_SPD 		= 100;
-static const int TURN_90 		= 300;
+static const int TURN_90 		      = 300;
 
-listen_data 	c2b1_rcv_500ms			= {515, 30, 1, 0, 5};
-move_time_data       c2b1_fwd_12in           = {100, INCH_TRAVEL*12, FWD_TRAVEL_SPD, FWD_TRAVEL_SPD,   0, 10};
-move_time_data       c2b1_stop_1      		= {100, 1000,	0,	 0,	  0, 15};
-move_time_data       c2b1_turn_180      		= {100, TURN_90*2, TURN_WHEEL_SPD, OPP_WHEEL_SPD, 0, 20};
-move_time_data       c2b1_back_3     		= {100, INCH_TRAVEL*3, -FWD_TRAVEL_SPD, -FWD_TRAVEL_SPD,   0, 25};
-move_time_data       c2b1_stop_2      		= {100, 1000,	0,	 0,	  0, 30};
-move_time_data       c2b1_left_90      		= {100, TURN_90, TURN_WHEEL_SPD, OPP_WHEEL_SPD, 0, 35};
-move_time_data       c2b1_right_1      		= {100, TURN_90, OPP_WHEEL_SPD, TURN_WHEEL_SPD, 0, 40};
-move_time_data       c2b1_lightstop_1      	= {100, 500,	0,	 0,	  0, 45}; 
+listen_data 	       c2b1_rcv_500ms			  = {500, 250, 150, 100, 5,BLUE_PATH_LED_FLASH};
+move_time_data       c2b1_fwd_12in        = {100, INCH_TRAVEL*12, FWD_TRAVEL_SPD, FWD_TRAVEL_SPD, 8};    // state 5 -> 8
+flashled_data        c2b1_flash_head      = {HEADLIGHT_LED_FLASH, 2, 10}; //gonna remove later  
+move_time_data       c2b1_stop_1      		= {100, 1000,	0,	 0, 15};
+move_time_data       c2b1_turn_180        = {100, TURN_90*2, TURN_WHEEL_SPD, OPP_WHEEL_SPD, 20};
+move_time_data       c2b1_back_3     		  = {100, INCH_TRAVEL*3, -FWD_TRAVEL_SPD, -FWD_TRAVEL_SPD, 25};
+move_time_data       c2b1_stop_2      		= {100, 1000,	0,	 0,	  30};
+move_time_data       c2b1_left_90      		= {100, TURN_90, TURN_WHEEL_SPD, OPP_WHEEL_SPD, 35};
+move_time_data       c2b1_right_1      		= {100, TURN_90, OPP_WHEEL_SPD, TURN_WHEEL_SPD, 40};
+move_time_data       c2b1_lightstop_1     = {100, 500,	0,	 0,	  45}; 
 move_time_data       c2b1_right_2      		= {100, TURN_90, OPP_WHEEL_SPD, TURN_WHEEL_SPD, 50};
-move_time_data       c2b1_lightstop_2      	= {100, 500,	0,	 0,	  0, 55};
+move_time_data       c2b1_lightstop_2     = {100, 500,	0,	 0,	  55};
 move_time_data       c2b1_right_3      		= {100, TURN_90, OPP_WHEEL_SPD, TURN_WHEEL_SPD, 60};
-move_time_data		c2b1_back_to_start		= {100, INCH_TRAVEL*15, -FWD_TRAVEL_SPD, -FWD_TRAVEL_SPD,   0, 65};
-talk_data		c2b1_send_500ms			= {500, 0, 69};
+move_time_data		   c2b1_back_to_start		= {100, INCH_TRAVEL*14, -FWD_TRAVEL_SPD, -FWD_TRAVEL_SPD,  65};
+talk_data		         c2b1_send_500ms			= {500, 69};
+
 
 // BOT 2 Challenge 2 ----------------------------- 
-talk_data		c2b2_send_500ms			= {500, 0, 2};
-listen_data 	c2b2_rcv_500ms			= {515, 30, 1, 0, 5};
-move_time_data       c2b2_fwd_12in           = {100, INCH_TRAVEL*12, FWD_TRAVEL_SPD, FWD_TRAVEL_SPD,   0, 10};
-move_time_data       c2b2_stop_1      		= {100, 1000,	0,	 0,	  0, 15};
-move_time_data       c2b2_turn_180      		= {100, TURN_90*2, TURN_WHEEL_SPD, OPP_WHEEL_SPD, 0, 20};
-move_time_data       c2b2_back_3     		= {100, INCH_TRAVEL*3, -FWD_TRAVEL_SPD, -FWD_TRAVEL_SPD,   0, 25};
-move_time_data       c2b2_stop_2      		= {100, 1000,	0,	 0,	  0, 30};
-move_time_data       c2b2_left_90      		= {100, TURN_90, TURN_WHEEL_SPD, OPP_WHEEL_SPD, 0, 35};
-move_time_data       c2b2_right_1      		= {100, TURN_90, OPP_WHEEL_SPD, TURN_WHEEL_SPD, 0, 40};
-move_time_data       c2b2_lightstop_1      	= {100, 500,	0,	 0,	  0, 45}; 
+//listen_data     c1b1_listen_bot2_start  = {615, 500, 300, 40, 62, BLUE_STATE_LED_FLASH};       // state 60 -> 62 (RCV 500 ms
+
+talk_data		         c2b2_send_500ms			= {500, 2};
+listen_data 	       c2b2_rcv_500ms			  = {500, 300, 200, 100, 5,BLUE_PATH_LED_FLASH};
+move_time_data       c2b2_fwd_12in        = {100, INCH_TRAVEL*12, FWD_TRAVEL_SPD, FWD_TRAVEL_SPD, 10};
+move_time_data       c2b2_stop_1      		= {100, 1000,	0,	 0, 15};
+move_time_data       c2b2_turn_180        = {100, TURN_90*2, TURN_WHEEL_SPD, OPP_WHEEL_SPD, 20};
+move_time_data       c2b2_back_3     		  = {100, INCH_TRAVEL*3, -FWD_TRAVEL_SPD, -FWD_TRAVEL_SPD, 25};
+move_time_data       c2b2_stop_2      		= {100, 1000,	0,	 0, 30};
+move_time_data       c2b2_left_90      		= {100, TURN_90 , TURN_WHEEL_SPD, OPP_WHEEL_SPD, 35};
+move_time_data       c2b2_right_1      		= {100, TURN_90, OPP_WHEEL_SPD, TURN_WHEEL_SPD, 40};
+move_time_data       c2b2_lightstop_1     = {100, 500,	0,	 0,	 45}; 
 move_time_data       c2b2_right_2      		= {100, TURN_90, OPP_WHEEL_SPD, TURN_WHEEL_SPD, 50};
-move_time_data       c2b2_lightstop_2      	= {100, 500,	0,	 0,	  0, 55};
+move_time_data       c2b2_lightstop_2     = {100, 500,	0,	 0,	 55};
 move_time_data       c2b2_right_3      		= {100, TURN_90, OPP_WHEEL_SPD, TURN_WHEEL_SPD, 60};
-move_time_data		c2b2_back_to_start		= {100, INCH_TRAVEL*15, -FWD_TRAVEL_SPD, -FWD_TRAVEL_SPD,   0, 69};
+move_time_data		   c2b2_back_to_start		= {100, INCH_TRAVEL*14, -FWD_TRAVEL_SPD, -FWD_TRAVEL_SPD, 69};
 
 // BOT 1 Challenge 3 -------------------------------- 
-move_if_data 	c3b1_forward_light		= {100, headlights_sensed, FWD_TRAVEL_SPD, FWD_TRAVEL_SPD, 5);
-move_time_data       c3b1_stop_5s      		= {100, 5000,	0,	 0,	  0, 10};
-talk_data		c3b1_send_500ms			= {500, 0, 15};
-flashled_data 	c3b1_flash_head_twice	= {HEADLIGHT_LED_FLASH, 2, 0, 0, 0, 0}; 	
-flashed_data 	c3b1_illuminate_turn	= {};
+move_time_data      c3b1_wait_start       = {100, 1000, 0, 0, 3};
+move_if_data 	      c3b1_forward_light		= {100, headlights_sensed, FWD_TRAVEL_SPD, FWD_TRAVEL_SPD, 5};
+move_time_data      c3b1_stop_5s      		= {100, 2000,	0,	 0, 10};
+talk_data		        c3b1_send_500ms			  = {500, 15};
+flashled_data 	    c3b1_flash_head_twice	= {HEADLIGHT_LED_FLASH, 2, 20}; 	
+flashled_data 	    c3b1_illuminate_turnL	= {LTURN_LED_FLASH, 10, 25};
+flashled_data       c3b1_illuminate_turnR = {RTURN_LED_FLASH, 10, 69};
 
 // BOT 2 Challenge 3 -------------------------------- 
-move_if_data 	c3b2_forward_light		= {100, headlights_sensed, FWD_TRAVEL_SPD, FWD_TRAVEL_SPD, 5);
-listen_data		c3b2_rcv_500ms			= {515, 30, 1, 0, 10};
-flashled_data 	c3b2_flash_head_twice	= {HEADLIGHT_LED_FLASH, 2, 0, 0, 0, 0};	
-flashed_data 	c3b2_illuminate_turn	= {};
-*/
+move_time_data      c3b2_wait_start       = {100, 1000, 0, 0, 3};
+move_if_data 	      c3b2_forward_light		= {100, headlights_sensed, FWD_TRAVEL_SPD, FWD_TRAVEL_SPD, 5};
+listen_data		      c3b2_rcv_500ms			  = {500, 250, 150, 200, 10, BLUE_PATH_LED_FLASH};
+flashled_data 	    c3b2_flash_head_twice	= {HEADLIGHT_LED_FLASH, 2, 15};	
+flashled_data       c3b2_illuminate_turnL = {LTURN_LED_FLASH, 10, 20};
+flashled_data       c3b2_illuminate_turnR = {RTURN_LED_FLASH, 10, 69};
+
 #endif
