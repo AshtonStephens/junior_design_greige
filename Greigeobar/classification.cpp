@@ -5,7 +5,7 @@
 //          input and input Beta Coefficients
 // By: Ashton Stephens
 // Date: 3/8/18
-//
+// 
 
 /* THE PROBLEM:
  *
@@ -34,7 +34,7 @@
  * lights on we have four readings that allow us to determine what 
  * color we're on.
  * 
- * (just red on -> just blue on -> ...)
+ * (just red on -> both on -> just blue on -> both off -> ...)
  * 
  * NOTE: the Beta values are derived using a separate piece of code
  * that does not run while the bot is running. The Beta values are 

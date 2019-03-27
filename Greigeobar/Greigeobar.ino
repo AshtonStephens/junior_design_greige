@@ -61,7 +61,7 @@ void startup_script();
 const float redBsl[NPARAMS+1] = {-6.068814, -18.489579, 29.352758};
 const float bluBsl[NPARAMS+1] = {-12.743714, 22.864221, -3.947755};
 const float redBsr[NPARAMS+1] = {-3.680531, -16.105715, 22.564435};
-const float bluBsr[NPARAMS+1] =  {-10.350145, 24.930389, -8.754170};
+const float bluBsr[NPARAMS+1] = {-10.350145, 24.930389, -8.754170};
 #endif
     
 #ifdef GREIGE
