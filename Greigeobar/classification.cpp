@@ -36,6 +36,10 @@
  * 
  * (both on -> just red on -> both off -> just blue on -> ...)
  * 
+ * NOTE: the Beta values are derived using a separate piece of code
+ * that does not run while the bot is running. The Beta values are 
+ * generated using a simple logistic regression algorithm.
+ * 
  */
 
 #include "classification.h"
