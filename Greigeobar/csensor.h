@@ -15,13 +15,20 @@
 
 // MAKE MORE PROMINENT
 typedef float Betas[NPARAMS+1];
-#define DEBUG_CSENSOR_COLORS
+
+//#define DEBUG_CSENSOR_COLORS
 //#define DEBUG_CSENSOR_RAW
 
-/* csensor - color sensor
- *
+/* csensor - color sensor class for both front sensors.
  * 
+ * .sense() - ensures the internal sensor values are up to date
+ *            and gives permission to the sensor unit to perform
+ *            any action it need to do achieve that
  * 
+ * .left()  - provides most up to date color from the left sensor
+ * .right() - provides most up to date color from the right sensor  
+ * 
+ * .off()   - shuts the power off
  * 
  */
 class csensor 
@@ -73,12 +80,25 @@ class csensor
 
     ~csensor(){};
 
+    // sense - updates the internal left and right color values (if it can)
+    // 
+    // after calling sense, the sensor guarantees that the readings inside 
+    // the sensor struct as up to date as possible.
     void sense ()
     {
+        // Because the analog light sensor has some capacitance, the 
+        // red or blue light needs to stay on for enough time for the
+        // reading to stabilize. This if statement prevents any decisions
+        // being made about the color until the light has been on long
+        // enough for the sensor value to be stable.
         if (stabilization_time < millis() - time_of_last_read) {
             time_of_last_read = millis();
-            get_readings();
-            switch_led_color();
+
+            get_readings(); // update internal readings from given on color
+            switch_led_color(); 
+
+            // if we've finished cycling through colors, decide what
+            // color we're on (uses logistic algorithm)
             if (led_color_state == 0) {
                 decide_colors ();
                 reset_readings();
@@ -102,8 +122,6 @@ class csensor
     }
     
     private:
-    
-    // DUMB HELPER FUNCTIONS
     
     void switch_led_color ()
     {
@@ -151,11 +169,10 @@ class csensor
    
     void decide_colors  ()
     {
-        // ----------------------------- TEMPORARY DEBUG CODE -----------------
+        color_left  = predict_full(readings_left , redB_left , bluB_left ); 
+        color_right = predict_full(readings_right, redB_right, bluB_right); 
 
-        
-        color_left  = predict_full(readings_left ,redB_left ,bluB_left ); 
-        color_right = predict_full(readings_right,redB_right,bluB_right); 
+    // ----------------------------- TEMPORARY DEBUG CODE -----------------
 
         #ifdef  DEBUG_CSENSOR_COLORS
           Serial.print("[");
@@ -186,13 +203,20 @@ class csensor
             Serial.print("BLACK");
             break;  
           default :
+            // for when you're sure about your code,
+            // but apparently not too sure..?
             Serial.print("IMPOSSIBLE");
             break;
         }
     }
 
-    /* print_readings
-     * outputs the literal readings within the sensor 
+    /* print_readings - literally just for debugging
+     *
+     * outputs the literal readings within the sensor. Each "sensor" on this bot
+     * actually has two analog sensors which will have a reading when the blue
+     * light is being flashed, and when the red light is being flashed. As such, 
+     * we print out here a blue and red reading for the left sensor, and a blue and
+     * red reading for the right sensor. 
      */
     void print_readings(float readingsl[NPARAMS],float readingsr[NPARAMS]) 
     {
