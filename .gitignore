@@ -2,3 +2,4 @@
 *.swp
 *~
 part2/40_test_images/*
+.vscode/*

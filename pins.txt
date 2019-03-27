@@ -1,3 +1,6 @@
+// Pin documentation 
+// because we don't know what goes where
+
 // cool lights ---------
 #define L_TURNSIGNAL 0
 #define R_TURNSIGNAL 1
@@ -20,8 +23,8 @@
 #define STATE_SWITCH_4   41
 
 // sensor network ------------//
-#define L_LIGHT_SENSOR A5 // ?
-#define R_LIGHT_SENSOR A6 // ?
+#define L_LIGHT_SENSOR A5 //
+#define R_LIGHT_SENSOR A6 //
 #define HALL_EFFECT    3  //
 #define RED_LED        29 //
 #define BLUE_LED       28 //
