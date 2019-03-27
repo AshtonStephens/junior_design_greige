@@ -297,7 +297,7 @@ struct move_time_data
 
 
 listen_data    listen_test     = {400, 300, 200, 50, 6, BLUE_PATH_LED_FLASH};                               // state 1 -> 69
-flashled_data testflasjh   = {RED_STATE_LED_FLASH|BLUE_STATE_LED_FLASH, 500, 69}; // state 6 -> 69
+flashled_data testflash   = {RED_STATE_LED_FLASH|BLUE_STATE_LED_FLASH, 500, 69}; // state 6 -> 69
 
 /*
 

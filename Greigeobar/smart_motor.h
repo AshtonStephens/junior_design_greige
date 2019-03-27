@@ -52,7 +52,8 @@ public:
         motor_go(0);
     } 
 
-    int speed_ () {
+    int speed_ () 
+    {
         return current_speed; 
     }
 
@@ -70,17 +71,7 @@ public:
     }
     
     void maintain ()
-    {
-        /*
-        Serial.println(__func__);
-        Serial.print("current_speed: ");
-        Serial.println(current_speed);
-        Serial.print("final_speed: ");
-        Serial.println(final_speed);
-        Serial.print("coeff: ");
-        Serial.println(coeff);
-        Serial.println(); */
-        
+    {   
         int ds;
         int new_speed;
         long long current_update;
@@ -115,15 +106,7 @@ public:
         last_update = current_update;
     }
 
-    void debug () 
-    {
-      /*
-        DBG;
-        _VAR(current_speed);
-        _VAR(final_speed);
-        _VAR(coeff);
-      */
-    }
+    void debug () {}
     
     void set_transition (int current_speed_, int final_speed_, 
             int constant, motor_transition transition_)

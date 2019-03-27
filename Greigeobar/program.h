@@ -1,7 +1,12 @@
-/* 
- * program.h
+/* program.h
  *
- * */
+ * purpose: holds all the "programs" hidden within the bot. The programs
+ *          are written using the state machine format in states.h
+ * 
+ * By: Ashton Stephens, Aji Sjamsu, Ashish Neupane, Liam Crowley
+ * 
+ * Date: 4/22/18
+ */
 
 #ifndef PROGRAM_H_
 #define PROGRAM_H_
@@ -9,8 +14,10 @@
 #include "states.h"
 #include "program_functions.h"
 
+// FORMAT REMINDER:
+//
 // state             = {function, arguments}
-// state_initializer = {threads, id, {function, ,arguments}}
+// state_initializer = {threads, id, {function, arguments}}
 
 state_initializer STATE_PROGRAM [] = 
 {
@@ -19,19 +26,19 @@ state_initializer STATE_PROGRAM [] =
      THREAD_6|THREAD_7|
      THREAD_8|THREAD_9|THREAD_10|
      THREAD_11|THREAD_12|THREAD_13|
-     THREAD_14|THREAD_15, HALL_INTERRUPT,{pop,NULL}},
+     THREAD_14|THREAD_15, HALL_INTERRUPT, {pop,NULL}},
 
     {THREAD_0|THREAD_1|THREAD_2|
      THREAD_3|THREAD_4|THREAD_5|
      THREAD_6|THREAD_7|
      THREAD_8|THREAD_9|THREAD_10|
      THREAD_11|THREAD_12|THREAD_13|
-     THREAD_14|THREAD_15, COLLISION_INTERRUPT,{pop,NULL}},
+     THREAD_14|THREAD_15, COLLISION_INTERRUPT, {pop,NULL}},
 
     //---
     {THREAD_0,  1, {none, NULL}},
 
-  	// challenge 1 bot 1
+  	// CHALLENGE 1 BOT 1 ------------------------------------------------------
     {THREAD_1, 1,{flashled,   &c1b1_initflash}},           	    // state 1 -> 4
     {THREAD_1, 4,{talk,       &c1b1_start_talk}},              	// state 4 -> 5
     {THREAD_1, 5,{flashled,   &c1b1_startflash}},          	    // state 5 -> 6
@@ -71,7 +78,7 @@ state_initializer STATE_PROGRAM [] =
   	{THREAD_1,66,{move_if,    &c1b1_final_collision}},          // state 66 -> 68
   	{THREAD_1,68,{flashled,   &c1b1_final_flash }},             // state 68 -> 69
   	
-  	// challenge 1 bot 2
+  	// CHALLENGE 1 BOT 2 ------------------------------------------------------
   	{THREAD_2, 1,{listen,	    &c1b2_init_listen}}, 			        // state 1 -> 2 *** CHANGE BACK TO 500
   	{THREAD_2, 2,{flashled,   &c1b2_initflash}},           	    // state 2 -> 4
   	{THREAD_2, 4,{talk,       &c1b2_start_talk}},               // state 4 -> 5
@@ -108,41 +115,40 @@ state_initializer STATE_PROGRAM [] =
   	{THREAD_2,60,{move_if,    &c1b2_final_collision}},          // state 60 -> 65
   	{THREAD_2,65,{flashled,   &c1b2_final_flash}}, 			        // state 65 -> 69
     
-    //CHALLENGE 2 BOT 1
-    {THREAD_3, 1,  {listen,     &c2b1_rcv_500ms}},          // receive 500ms message
-    {THREAD_3, 5,  {move_time,  &c2b1_fwd_12in}},      // move forward 12
-    {THREAD_3, 8,  {flashled,   &c2b1_flash_head}},  //gonna remove
-    {THREAD_3, 10, {move_time,  &c2b1_stop_1}},          // STOP #1
-    {THREAD_3, 15, {move_time,  &c2b1_turn_180}},        // Turn around 180
-    {THREAD_3, 20, {move_time,  &c2b1_back_3}},          // Backwards 3
-    {THREAD_3, 25, {move_time,  &c2b1_stop_2}},          // STOP #2
-    {THREAD_3, 30, {move_time,  &c2b1_left_90}},         // Turn left 90
-    {THREAD_3, 35, {move_time,  &c2b1_right_1}},         // Turn right 
-    {THREAD_3, 40, {move_time,  &c2b1_lightstop_1}},     // Light stop
-    {THREAD_3, 45, {move_time,  &c2b1_right_2}},         // Turn right
-    {THREAD_3, 50, {move_time,  &c2b1_lightstop_2}},     // Light stop
-    {THREAD_3, 55, {move_time,  &c2b1_right_3}},         // Turn right 
-    {THREAD_3, 60, {move_time,  &c2b1_back_to_start}},   // Do your best to MOVE TO START
-    {THREAD_3, 65, {talk,       &c2b1_send_500ms}},          // Send 500ms message to Bot 2 (stop auto)
+    // CHALLENGE 2 BOT 1 ------------------------------------------------------
+    {THREAD_3, 1,  {listen,     &c2b1_rcv_500ms}},        // receive 500ms message
+    {THREAD_3, 5,  {move_time,  &c2b1_fwd_12in}},         // move forward 12
+    {THREAD_3, 8,  {flashled,   &c2b1_flash_head}},       // gonna remove (or not..?)
+    {THREAD_3, 10, {move_time,  &c2b1_stop_1}},           // STOP #1
+    {THREAD_3, 15, {move_time,  &c2b1_turn_180}},         // Turn around 180
+    {THREAD_3, 20, {move_time,  &c2b1_back_3}},           // Backwards 3
+    {THREAD_3, 25, {move_time,  &c2b1_stop_2}},           // STOP #2
+    {THREAD_3, 30, {move_time,  &c2b1_left_90}},          // Turn left 90
+    {THREAD_3, 35, {move_time,  &c2b1_right_1}},          // Turn right 
+    {THREAD_3, 40, {move_time,  &c2b1_lightstop_1}},      // Light stop
+    {THREAD_3, 45, {move_time,  &c2b1_right_2}},          // Turn right
+    {THREAD_3, 50, {move_time,  &c2b1_lightstop_2}},      // Light stop
+    {THREAD_3, 55, {move_time,  &c2b1_right_3}},          // Turn right 
+    {THREAD_3, 60, {move_time,  &c2b1_back_to_start}},    // Do your best to MOVE TO START
+    {THREAD_3, 65, {talk,       &c2b1_send_500ms}},       // Send 500ms message to Bot 2 (stop auto)
 
- 
-    //CHALLENGE 2 BOT 2
-    {THREAD_4, 1,  {talk,       &c2b2_send_500ms}},      // send 500ms message
-    {THREAD_4, 2,  {listen,     &c2b2_rcv_500ms}},       // receive 500ms message
-    {THREAD_4, 5,  {move_time,  &c2b2_fwd_12in}},        // move forward 12
-    {THREAD_4, 10, {move_time,  &c2b2_stop_1}},          // STOP #1
-    {THREAD_4, 15, {move_time,  &c2b2_turn_180}},        // Turn around 180
-    {THREAD_4, 20, {move_time,  &c2b2_back_3}},          // Backwards 3
-    {THREAD_4, 25, {move_time,  &c2b2_stop_2}},          // STOP #2
-    {THREAD_4, 30, {move_time,  &c2b2_left_90}},         // Turn left 90
-    {THREAD_4, 35, {move_time,  &c2b2_right_1}},         // Turn right 
-    {THREAD_4, 40, {move_time,  &c2b2_lightstop_1}},     // Light stop
-    {THREAD_4, 45, {move_time,  &c2b2_right_2}},         // Turn right
-    {THREAD_4, 50, {move_time,  &c2b2_lightstop_2}},     // Light stop
-    {THREAD_4, 55, {move_time,  &c2b2_right_3}},         // Turn right 
-    {THREAD_4, 60, {move_time,  &c2b2_back_to_start}},   // Do your best to MOVE TO START
+    // CHALLENGE 2 BOT 2 ------------------------------------------------------
+    {THREAD_4, 1,  {talk,       &c2b2_send_500ms}},       // send 500ms message
+    {THREAD_4, 2,  {listen,     &c2b2_rcv_500ms}},        // receive 500ms message
+    {THREAD_4, 5,  {move_time,  &c2b2_fwd_12in}},         // move forward 12
+    {THREAD_4, 10, {move_time,  &c2b2_stop_1}},           // STOP #1
+    {THREAD_4, 15, {move_time,  &c2b2_turn_180}},         // Turn around 180
+    {THREAD_4, 20, {move_time,  &c2b2_back_3}},           // Backwards 3
+    {THREAD_4, 25, {move_time,  &c2b2_stop_2}},           // STOP #2
+    {THREAD_4, 30, {move_time,  &c2b2_left_90}},          // Turn left 90
+    {THREAD_4, 35, {move_time,  &c2b2_right_1}},          // Turn right 
+    {THREAD_4, 40, {move_time,  &c2b2_lightstop_1}},      // Light stop
+    {THREAD_4, 45, {move_time,  &c2b2_right_2}},          // Turn right
+    {THREAD_4, 50, {move_time,  &c2b2_lightstop_2}},      // Light stop
+    {THREAD_4, 55, {move_time,  &c2b2_right_3}},          // Turn right 
+    {THREAD_4, 60, {move_time,  &c2b2_back_to_start}},    // Do your best to MOVE TO START
 
-    //CHALLENGE 3 BOT 1
+    // CHALLENGE 3 BOT 1 ------------------------------------------------------
     {THREAD_5, 1,  {move_time,  &c3b1_wait_start}},
     {THREAD_5, 3,  {move_if,    &c3b1_forward_light}},    //move forward until light sensed
     {THREAD_5, 5,  {move_time,  &c3b1_stop_5s}},          //stop 5 seconds
@@ -151,7 +157,7 @@ state_initializer STATE_PROGRAM [] =
     {THREAD_5, 20, {flashled,   &c3b1_illuminate_turnL}},
     {THREAD_5, 25, {flashled,   &c3b1_illuminate_turnR}},
  
-    //CHALLENGE 3 BOT 2
+    // CHALLENGE 3 BOT 2 ------------------------------------------------------
     {THREAD_6, 1,  {move_time,  &c3b1_wait_start}},
     {THREAD_6, 3,  {move_if,    &c3b2_forward_light}},
     {THREAD_6, 5,  {listen,     &c3b2_rcv_500ms}},
@@ -159,17 +165,20 @@ state_initializer STATE_PROGRAM [] =
     {THREAD_6, 15, {flashled,   &c3b2_illuminate_turnL}},
     {THREAD_6, 20, {flashled,   &c3b2_illuminate_turnR}},
 
+    // COMMS TEST -------------------------------------------------------------
+    // send out signal
+    {THREAD_8, 1,  {talk,      &testComms_talk_400}},   // state: 1 -> 5
+    {THREAD_8, 5,  {move_time, &testComms_pause}},      // state: 5 -> 10 
+    {THREAD_8, 10, {move_time, &testComms_talk_400_2}}, // state: 10 -> 69 
     
-    // COMMS TEST:
-    {THREAD_8, 1,  {talk,    &testComms_talk_400}},        // state: 1 -> 5
-    {THREAD_8, 5,  {move_time, &testComms_pause}},         // state: 5 -> 10 
-    {THREAD_8, 10, {move_time, &testComms_talk_400_2}},   // state: 10 -> 69 
-    
-    {THREAD_9,1,{listen, &listen_test}},
-    {THREAD_9,6,{flashled, &testflasjh}},
+    // receive signal
+    {THREAD_9,1,{listen,   &listen_test}},
+    {THREAD_9,6,{flashled, &testflash}},
 
- 
     // STOPPING STATE
+    // sets state 69 to be the final state for all state machine "programs."
+    // Despite being formally trained engineers, lets be honest - we're all 
+    // unapologetically 12 year olds on the inside.
     {THREAD_0|THREAD_1|THREAD_2|
      THREAD_3|THREAD_4|THREAD_5|
      THREAD_6|THREAD_7|
@@ -177,6 +186,5 @@ state_initializer STATE_PROGRAM [] =
      THREAD_11|THREAD_12|THREAD_13|
      THREAD_14|THREAD_15, 69,{hardware_stop,NULL}}
 };
-
 
 #endif

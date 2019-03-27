@@ -1,10 +1,12 @@
 /*  
  * lights.h
  *
- * purpose: maintains the proper outputs of the lights
+ * purpose: maintains the proper outputs of the lights and
+ *          adds fancy functionality with non-cumbersome 
+ *          functions.
  *
  * date: 4/28/18
- *
+ * by: Ashton Stephens
  */
 
 

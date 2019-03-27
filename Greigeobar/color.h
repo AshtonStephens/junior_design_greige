@@ -2,8 +2,8 @@
  * color.h
  *
  * Purpose: defines colors
- * Date: 03/06/18
  * By: Ashton Stephens
+ * Date: 03/06/18
  *
  */
 

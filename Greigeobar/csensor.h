@@ -2,9 +2,8 @@
 // csensor.h
 //
 // Purpose: To define the color sensor system of the autonomous bot
-//
-// Date: 3-3-18 
-// By:  Ashton Stephens
+// By: Ashton Stephens
+// Date: 3/3/18 
 //
 
 #ifndef CSENSOR_H

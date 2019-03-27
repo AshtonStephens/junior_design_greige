@@ -1,5 +1,3 @@
-
-
 #ifndef STATE_H_
 #define STATE_H_
 
@@ -86,8 +84,6 @@ void initialize_thread
         } else {
             thread[si[i].id] = si[i].s;
         }
-        
-        
     }
 }
 
