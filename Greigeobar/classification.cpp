@@ -30,11 +30,11 @@
  * the variability in the sensors, we use a logistic machine learning
  * algorithm to decide whether there is a strong red component and 
  * strong blue component for each period of the red and blue lights
- * flashing. Because we iterate over 4 states of the blue and red
+ * flashing. Because we iterate over 2 states of the blue and red
  * lights on we have four readings that allow us to determine what 
  * color we're on.
  * 
- * (both on -> just red on -> both off -> just blue on -> ...)
+ * (just red on -> just blue on -> ...)
  * 
  * NOTE: the Beta values are derived using a separate piece of code
  * that does not run while the bot is running. The Beta values are 
