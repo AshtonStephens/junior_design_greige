@@ -1,6 +1,22 @@
-# Greige
-### Junior Design 2018
+# Junior Design - Autonomous Cars 
+## Teams Greige and Zinnobar
 
-Working with team Zinnobar
+Junior design is a course that undergraduate Electrical and Computer Engineers take at Tufts that is intended to prepare them for the real world of product design. In the course, students are given unclear spec sheets, a 
 
-![alt text](https://youtu.be/BbQg9Y1nR-k)
+
+
+
+
+
+
+
+
+
+Contributers:
+- Ashton Stephens
+- Liam Crowley
+- Ashish Neupane
+- Aji Sjamsu
+- Joseph Meng
+- Victor Dinh
+
