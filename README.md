@@ -11,6 +11,7 @@ Junior design is a course that undergraduate Electrical and Computer Engineers t
 ![Alt Text](./readme/gifs/challenge2.gif)
 
 ```c
+/* excerpt from program.h */
 // CHALLENGE 2 BOT 1 ------------------------------------------------------
     {THREAD_3, 1,  {listen,     &c2b1_rcv_500ms}},        // receive 500ms message
     {THREAD_3, 5,  {move_time,  &c2b1_fwd_12in}},         // move forward 12
@@ -31,6 +32,18 @@ Junior design is a course that undergraduate Electrical and Computer Engineers t
 
 ## Challenge 3
 ![Alt Text](./readme/gifs/challenge3.gif)
+
+```c
+    /* excerpt from program.h */
+    // CHALLENGE 3 BOT 1 ------------------------------------------------------
+    {THREAD_5, 1,  {move_time,  &c3b1_wait_start}},
+    {THREAD_5, 3,  {move_if,    &c3b1_forward_light}},    //move forward until light sensed
+    {THREAD_5, 5,  {move_time,  &c3b1_stop_5s}},          //stop 5 seconds
+    {THREAD_5, 10, {talk,       &c3b1_send_500ms}},
+    {THREAD_5, 15, {flashled,   &c3b1_flash_head_twice}},
+    {THREAD_5, 20, {flashled,   &c3b1_illuminate_turnL}},
+    {THREAD_5, 25, {flashled,   &c3b1_illuminate_turnR}},
+```
 
 
 Contributers:
