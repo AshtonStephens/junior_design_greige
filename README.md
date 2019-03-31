@@ -46,6 +46,8 @@ by team Zinnobar and to the right is "Susan", of team Greige.
 ## Challenge 1
 ![Gif of Bots Performing the first challenge the robots can do](./readme/gifs/challenge1primary.gif)
 
+TODO: EXPLAIN WHAT THIS CHALLENGE REQUIRED
+
 ```c
 /* excerpt from program.h */
 // CHALLENGE 1 BOT 1 ------------------------------------------------------
@@ -57,6 +59,8 @@ by team Zinnobar and to the right is "Susan", of team Greige.
 
 ## Challenge 2
 ![Gif of Bots Performing the second challenge the robots can do](./readme/gifs/challenge2.gif)
+
+TODO: EXPLAIN WHAT THIS CHALLENGE REQUIRED
 
 ```c
 /* excerpt from program.h */
@@ -80,6 +84,8 @@ by team Zinnobar and to the right is "Susan", of team Greige.
 
 ## Challenge 3
 ![Gif of Bots Performing the third challenge the robots can do](./readme/gifs/challenge3.gif)
+
+TODO: EXPLAIN WHAT THIS CHALLENGE REQUIRED
 
 ```c
     /* excerpt from program.h */
