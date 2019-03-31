@@ -37,7 +37,7 @@ resistors, transistors, capacitors, leds, and inductors. The complete robots
 shown below include two systems that aren't labeled and are located in the back 
 of the bots - the power distribution system and the motor power system.
 
-![Labeled photo of robot parts layout without all comonents](./readme/images/bots_together_colored.jpg)
+![Labeled photo of robot parts layout without all comonents](./readme/images/bots_together_colored_small.jpg)
 
 The bots above are the final design of the bots. To the left is "Galactus 
 Destroyer of Pedestrians" by team Zinnobar and to the right is "Susan", of team 
