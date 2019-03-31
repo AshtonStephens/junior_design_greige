@@ -4,23 +4,26 @@
 Junior design is a course that undergraduate Electrical and Computer Engineers take at 
 Tufts that is intended to prepare them for the real world of product design. The project
 boils down to creating an autonomous car that completes a route and some sort of
-challenge.
-
-Creating an autonomous vehicle is hard under normal circumstances - 
+challenge - in this project, the task was to create an autonomous car that could
+complete a route that looked like roads and avoid pedestrians.
 
 Key details of the course are:
 - Every robot is made by a team of 3 Electrical engineering students.
 - Each team member needs to keep an engineering notebook documenting the
     design process adn parts of the circuit for reference
-- 
+- Parts of the robot are outsourced to other teams in the class by designing
+    a specification sheet and requesting the design. 
 
 What makes this project hard is:
 - Every part of the bot is made using rudimentary circuit components except 
     the arduino processor and the physical internals of the motors.
-- all rudimentary parts used in the project have spec sheets with somewhat
+- All rudimentary parts used in the project have spec sheets with somewhat
     wrong data
-- all parts used have enough variation to make the programming of those components
-    significantly different.
+- Most parts used have enough variation to make the programming required for
+    between identical components significantly different
+- The project description and requirements are designed to be borderline impossible 
+    to complete, and the actual project requirements need to be determined by 
+    talking to stakeholders - (the professor)
 
 # Challenges
 ## Challenge 1
