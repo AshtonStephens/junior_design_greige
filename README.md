@@ -31,11 +31,17 @@ What makes this project hard is:
 
 ## The Bots
 
+The two bots have many different components bundled compactly into a single
+design. Each of the sections is created using basic circuit elements including 
+resistors, transistors, capacitors, leds, and inductors. The complete robots
+shown below include two systems that aren't labeled and are located in the back 
+of the bots - the power distribution system and the motor power system.
+
 ![Labeled photo of robot parts layout without all comonents](./readme/images/bots_together_colored.jpg)
 
 The bots above are the final design of the bots. To the left is "Galactus 
-Destroyer of Pedestrians" by team Zinnobar. To the right is "Susan", of team 
-Greige. The above photo shows
+Destroyer of Pedestrians" by team Zinnobar and to the right is "Susan", of team 
+Greige.
 
 # Challenges
 ## Challenge 1
