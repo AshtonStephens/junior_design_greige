@@ -93,8 +93,36 @@ by team Zinnobar and to the right is "Susan", of team Greige.
     {THREAD_5, 25, {flashled,   &c3b1_illuminate_turnR}},
 ```
 
+# How All This Works
+#### Hardware:
+The hardware components of the bot can be broken up into 5 sections with the
+corresponding code
 
-Contributers:
+- Power Distribution System
+- Communications Unit
+- lights
+    - `lights.h` - interface to light controls
+- Motor Power System
+    - `smart_motor.h` - control motor with smooth movements
+- Color Sensor
+    - `color.h` - define colors
+    - `csensor.h` - control sensor
+    - `classification.h` - convert sensor values to colors
+    - `classification.cpp`
+
+#### Software:
+In order to fully control the bot, a large amount of code is required to 
+program into the robot autonomous behavior. The files responsible for 
+dictating the autonomous behavior of the bot are:
+   
+- `Greigeobar.ino` - program entry point and pin definitions
+- `smart_bot.h` - interface to robot hardware
+- `program_functions.h` - contains the operational units performable by the robot
+- `program.h` - contains the sequence of operational units that make up a state program
+- `states.h` - defines what a state is
+- `state_machine.h` - runs program in program.h and uses it to control `smart_bot`
+
+### Contributers:
 - Ashton Stephens
 - Liam Crowley
 - Ashish Neupane
