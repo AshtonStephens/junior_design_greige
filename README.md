@@ -122,6 +122,8 @@ dictating the autonomous behavior of the bot are:
 - `states.h` - defines what a state is
 - `state_machine.h` - runs program in program.h and uses it to control `smart_bot`
 
+
+------------------------------
 ### Contributers:
 - Ashton Stephens
 - Liam Crowley
