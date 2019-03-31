@@ -1,16 +1,20 @@
-# Junior Design - Autonomous Cars 
-## Teams Greige and Zinnobar
+# Junior Design - Autonomous Car Design
+
+![Introduction Gif of Bots Performing the second challenge the robots can do](./readme/gifs/challenge2.gif)
+
+## The Project
 
 Junior design is a course that undergraduate Electrical and Computer Engineers take at 
 Tufts that is intended to prepare them for the real world of product design. The project
 boils down to creating an autonomous car that completes a route and some sort of
 challenge - in this project, the task was to create an autonomous car that could
-complete a route that looked like roads and avoid pedestrians.
+complete a route that looked like roads and avoid pedestrians as well as communicate
+to a watch tower about its position.
 
 Key details of the course are:
 - Every robot is made by a team of 3 Electrical engineering students.
 - Each team member needs to keep an engineering notebook documenting the
-    design process adn parts of the circuit for reference
+    design process and parts of the circuit for reference
 - Parts of the robot are outsourced to other teams in the class by designing
     a specification sheet and requesting the design. 
 
@@ -21,16 +25,33 @@ What makes this project hard is:
     wrong data
 - Most parts used have enough variation to make the programming required for
     between identical components significantly different
-- The project description and requirements are designed to be borderline impossible 
+- The project description and requirements are designed to be almost impossible 
     to complete, and the actual project requirements need to be determined by 
     talking to stakeholders - (the professor)
 
+## The Bots
+
+![Labeled photo of robot parts layout without all comonents](./readme/images/bots_together_colored.jpg)
+
+The bots above are the final design of the bots. To the left is "Galactus 
+Destroyer of Pedestrians" by team Zinnobar. To the right is "Susan", of team 
+Greige. The above photo shows
+
 # Challenges
 ## Challenge 1
-![Alt Text](./readme/gifs/challenge1primary.gif)
+![Gif of Bots Performing the first challenge the robots can do](./readme/gifs/challenge1primary.gif)
+
+```c
+/* excerpt from program.h */
+// CHALLENGE 1 BOT 1 ------------------------------------------------------
+
+    // the code for this challenge is too long to reasonably place in this 
+    // readme, but it can be found in lines  41-79 of 'program.h' above.
+
+```
 
 ## Challenge 2
-![Alt Text](./readme/gifs/challenge2.gif)
+![Gif of Bots Performing the second challenge the robots can do](./readme/gifs/challenge2.gif)
 
 ```c
 /* excerpt from program.h */
@@ -53,7 +74,7 @@ What makes this project hard is:
 ```
 
 ## Challenge 3
-![Alt Text](./readme/gifs/challenge3.gif)
+![Gif of Bots Performing the third challenge the robots can do](./readme/gifs/challenge3.gif)
 
 ```c
     /* excerpt from program.h */
